@@ -1,2 +1,17 @@
-# hp2wsfix
-Need for Speed: Hot Pursuit 2 PC - Widescreen fix
+# HP2WSFix
+A rudimentary widescreen fix for Need for Speed: Hot Pursuit 2 on PC
+
+# Status
+It currently only fixes the resolution in the menu and recalculates the camera's FOV.
+
+FrontEnd and HUD will still be stretched and needs further investigation in the code.
+
+# Usage
+Extract the contents of the .zip file to the game's root directory.
+
+# Downloads
+You should be able to download the files necessary in the Releases tab.
+
+# Credits
+- ThirteenAG - for the injector, inireader and the Ultimate ASI Loader.
+- EA Canada - the game code itself

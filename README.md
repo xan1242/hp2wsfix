@@ -6,6 +6,9 @@ It currently only fixes the resolution in the menu and recalculates the camera's
 
 FrontEnd and HUD will still be stretched and needs further investigation in the code.
 
+
+You can also reroute the save file to another directory of your liking.
+
 # Usage
 Extract the contents of the .zip file to the game's root directory.
 

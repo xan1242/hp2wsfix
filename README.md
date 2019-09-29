@@ -12,6 +12,8 @@ You can also reroute the save file to another directory of your liking.
 # Usage
 Extract the contents of the .zip file to the game's root directory.
 
+**TEMPORARY** - create a "save" directory in the game's root directory (this will not be necessary at a later point!)
+
 # Downloads
 You should be able to download the files necessary in the Releases tab.
 

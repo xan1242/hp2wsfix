@@ -474,9 +474,9 @@ char* GetUserDir_Hook()
 int InitRenderCaps()
 {
 	if (CheckForPathAbsolution(GetUserDir_Hook()))
-		sprintf(RenderCapsIni, "%s\\rendercaps.ini", GetUserDir_Hook());
+		sprintf(RenderCapsIni, "%srendercaps.ini", GetUserDir_Hook());
 	else
-		sprintf(RenderCapsIni, "..\\%s\\rendercaps.ini", GetUserDir_Hook()); // due to inireader's path defaulting to the scripts folder
+		sprintf(RenderCapsIni, "..\\%srendercaps.ini", GetUserDir_Hook()); // due to inireader's path defaulting to the scripts folder
 
 	// read the resolution from rendercaps.ini file directly
 	CIniReader rendercaps(RenderCapsIni);
@@ -544,7 +544,8 @@ int InitConfig()
 		sprintf(UserDir, "..\\%s", InputDirString);
 	
 	_mkdir(UserDir);
-	strncpy(UserDir, InputDirString, 255);
+	sprintf(UserDir, "%s\\", InputDirString);
+	//strncpy(UserDir, InputDirString, 255);
 
 	//}
 

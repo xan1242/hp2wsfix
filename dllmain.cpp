@@ -568,11 +568,6 @@ int InitRenderCaps()
 	aspect = (float)resX / (float)resY;
 	aspect_diff = (float)FOUR_BY_THREE_ASPECT / aspect;
 
-	// METHOD 2 - FIX Y FE SCALING BY CHANGING SCALING FACTOR
-	injector::WriteMemory<float>(0x00445BE3, aspect_diff, true); // FE 3D map actor Y scale
-	injector::WriteMemory<float>(0x0044D59D, aspect_diff, true); // FE car actor Y scale
-	injector::WriteMemory<float>(0x0049C3F3, aspect_diff, true); // FE 3D event tree actor Y scale
-
 	return 0;
 }
 
@@ -655,6 +650,11 @@ void InjectRes()
 	{
 		injector::WriteMemory<float>(0x45A8EC, (float)resX, true);
 		injector::WriteMemory<float>(0x45A8F3, (float)resY, true);
+
+		// METHOD 2 - FIX Y FE SCALING BY CHANGING SCALING FACTOR
+		injector::WriteMemory<float>(0x00445BE3, aspect_diff, true); // FE 3D map actor Y scale
+		injector::WriteMemory<float>(0x0044D59D, aspect_diff, true); // FE car actor Y scale
+		injector::WriteMemory<float>(0x0049C3F3, aspect_diff, true); // FE 3D event tree actor Y scale
 	}
 }
 

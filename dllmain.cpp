@@ -25,19 +25,27 @@
 #define FE_FUNCTIONS_YSCALE_ADDRESS 0x006C2DB4
 
 #define FOUR_BY_THREE_ASPECT 1.3333333333333333333333333333333
+#define LETTERBOX_ASPECT 2.1052631578947368421052631578947
+
+#define FE_HOR_SCALE_DRAW_ADDR 0x0054FF7D
 
 volatile int resX = 1280;
 volatile int resY = 720;
 volatile float resX_43f = 960.0;
+volatile float resX_600height = 1067.0;
 volatile float aspect;
 volatile float aspect_diff = 0.75;
+volatile float xscale_800 = 1.33375;
 
 
 char UserDir[255];
 char RenderCapsIni[255];
+char* CurrentFEElement;
+char* CurrentFEChild;
+char* LastFEChild;
 //bool bRerouteSaveDir = false;
 bool bEnableConsole = false;
-bool bFixHUD = true;
+int FixHUD = 1;
 unsigned int RenderMemorySize = 0x732000;
 
 float FE_horscale = 1.0;
@@ -62,6 +70,7 @@ int(__thiscall*sub_59B840)(unsigned int dis, char *key, unsigned int unk1, unsig
 int(__thiscall*sub_463090)(unsigned int dis, int unk1, int unk2, int unk3, int unk4, int unk5) = (int(__thiscall*)(unsigned int, int, int, int, int, int))0x463090;
 int(__thiscall*sub_469890)(unsigned int dis, int unk1, int unk2, int unk3, int unk4, int unk5, int unk6, int unk7) = (int(__thiscall*)(unsigned int, int, int, int, int, int, int, int))0x469890;
 int(__thiscall*sub_463920)(unsigned int dis, int unk1, int unk2, int unk3, int unk4, int unk5, int unk6, int unk7) = (int(__thiscall*)(unsigned int, int, int, int, int, int, int, int))0x463920;
+int(__thiscall*sub_59B6E0)(unsigned int dis, char *key, unsigned int unk1, unsigned int unk2) = (int(__thiscall*)(unsigned int, char*, unsigned int, unsigned int))0x59B6E0;
 
 void InjectRes();
 int InitRenderCaps();
@@ -73,13 +82,13 @@ struct UnkClass1
 	int y;
 };
 
-struct UnkClass2
+struct mBorders
 {
-	void* vtable;
-	float y1;
-	float x1;
-	float x2;
-	float y2;
+	int unk;
+	int topY;
+	int topX;
+	int botX;
+	int botY;
 };
 
 struct bVector4
@@ -124,7 +133,7 @@ int __stdcall sscanf_hook(const char* str, const char* Format, ...)
 	//	*(int*)botX = resX;
 	//*(int*)botX *= TEST_XSCALE;
 
-	printf("GUI.mBorders: [ %d , %d ] %d , %d\nTESTVAR_X: %x\n", *(int*)topX, *(int*)topY, *(int*)botX, *(int*)botY, &testvarX);
+	printf("GUI.mBorders (sscanf): [ %d , %d ] %d , %d\n", *(int*)topX, *(int*)topY, *(int*)botX, *(int*)botY);
 
 
 	return Result;
@@ -443,21 +452,126 @@ int __stdcall sub_463090_hook(int unk1, int X, int Y, int unk4, int unk5) // tex
 	return sub_463090(thethis, unk1, X, Y, unk4, unk5);
 }
 
-int __stdcall sub_59B840_hook(char *key, unsigned int unk1, unsigned int unk2)
+int __stdcall sub_59B840_hook(char *key, mBorders* unk1, unsigned int unk2)
 {
 	unsigned int thethis = 0;
 	_asm mov thethis, ecx
-	unsigned int retval = sub_59B840(thethis, key, unk1, unk2);
+	unsigned int retval = sub_59B840(thethis, key, (int)unk1, unk2);
 
 	// TEMPORARY HUD FIX
 	//*(int*)(unk1 + 0x4) = (int)FE_verposition; // Y POS
 	//*(int*)(unk1 + 0x8) += (int)FE_horposition; // X POS
 	//*(float*)FE_YSCALE_ADDRESS = resY / 600.0;
-	*(float*)FE_XPOS_ADDRESS = FE_horposition;
+
+	// TEST!
+	if (FixHUD > 1)
+		(*unk1).botX = resX_600height;
+
+	if (FixHUD == 1)
+		*(float*)FE_XPOS_ADDRESS = FE_horposition;
 
 	//*(int*)(unk1+0xC) = resX;
 	//*(int*)(unk1+0x10) = resY;
 
+	return retval;
+}
+
+int __stdcall sub_59B6E0_hook(char *key, unsigned int unk1, unsigned int unk2) // hook for fixing specific UI elements' mBorders
+{
+	unsigned int thethis = 0;
+	_asm mov thethis, ecx
+	unsigned int retval = sub_59B6E0(thethis, key, unk1, unk2);
+	CurrentFEChild = *(char**)(unk1 + 4);
+	//if (retval)
+	//	printf("Current FE child: %s\n", CurrentFEChild);
+
+	return retval;
+}
+
+int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) // hook for fixing specific UI elements' mBorders
+{
+	unsigned int thethis = 0;
+	_asm mov thethis, ecx
+	CurrentFEElement = *(char**)(thethis + 8);
+	unsigned int retval = sub_59B840(thethis, key, (int)unk1, unk2);
+
+	// TEST!
+	if (FixHUD > 1)
+	{
+		(*unk1).topX *= xscale_800;
+		if (((*unk1).botX == 800) || ((*unk1).botX == 640))
+		{
+			(*unk1).botX = resX_600height;
+		}
+		//printf("TESTVAR_X = %X\n", &testvarX);
+
+
+	//printf("TESTVAR_X = %X\n", &testvarX);
+
+	//if (strcmp(CurrentFEElement, "<TEXT>.FlashText") == 0)
+	//{
+	//	printf("Rendering map! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+	//	printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+	//	//(*unk1).botX = 0;
+	//}
+
+	// fix for hud - this will have to be coded specially for every element that is broken...
+	if (strcmp(CurrentFEElement, "sl1.HudText") == 0)
+	{
+		//(*unk1).topX = resX_600height * (1 - (*unk1).topX / resX_600height);
+		//printf("Rendering stats label 1! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+		//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+	}
+
+	if (strcmp(CurrentFEElement, "sl2.HudText") == 0)
+	{
+		//(*unk1).topX = resX_600height * 0.6;
+		//(*unk1).topX = (*unk1).topX * 0.1;
+		//printf("Rendering stats label 2! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+		//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+	}
+
+	if (strcmp(CurrentFEElement, "sl3.HudText") == 0)
+	{
+		//(*unk1).topX = resX_600height * 0.6;
+		//(*unk1).topX = (*unk1).topX * 0.1;
+		//printf("Rendering stats label 3! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+		//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+	}
+
+	if (strcmp(CurrentFEElement, "i0.GStaticImage") == 0)
+	{
+		(*unk1).topX /= xscale_800;
+		//printf("Rendering tach! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+		//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		//(*unk1).botX = 0;
+	}
+
+	// letterbox scaling
+	if (strcmp(CurrentFEElement, "boxT.GImageBox") == 0)
+	{
+		(*unk1).botY = (600 - (resX_600height / LETTERBOX_ASPECT)) / 2;
+		//printf("Rendering letterbox! %s | ADDRESS BotX: %X\n", CurrentFEElement, &(*unk1).botX);
+		//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		//(*unk1).botX = 0;
+	
+	}
+	
+	if (strcmp(CurrentFEElement, "boxB.GImageBox") == 0)
+	{
+		(*unk1).botY = (600 - (resX_600height / LETTERBOX_ASPECT)) / 2;
+		(*unk1).topY += 110 - (*unk1).botY;
+		//printf("Rendering letterbox! %s | ADDRESS BotX: %X\n", CurrentFEElement, &(*unk1).botX);
+	//	printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		//(*unk1).botX = 0;
+	}
+
+	//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+
+	//printf("sub_59B840: %X %X %X %X %X %X %X\n", *(int*)(thethis), *(int*)(thethis + 4), *(int*)(thethis + 8), *(int*)(thethis + 12), *(int*)(thethis + 16), *(int*)(thethis + 20), *(int*)(thethis + 24));
+	
+	//printf("%s\n", *(int*)(thethis + 8));
+	}
 	return retval;
 }
 
@@ -534,9 +648,10 @@ int InitRenderCaps()
 	}
 
 	// TEMPORARY HUD FIX
-	if (bFixHUD)
+	if (FixHUD)
 	{
 		resX_43f = ((float)resY * (4.0f / 3.0f));
+
 		//FE_horposition = 640.0f / (640.0f * (1.0f / resX * (resY / 480.0f)) * 2.0f);
 		//FE_horposition = 240;
 		FE_horscale = resX_43f / 800.0;
@@ -544,7 +659,8 @@ int InitRenderCaps()
 		//FE_verposition = (resY - 600.0) / 2;
 
 		*(float*)FE_XSCALE_ADDRESS = FE_horscale;
-		*(float*)FE_XPOS_ADDRESS = FE_horposition;
+		if (FixHUD == 1)
+			*(float*)FE_XPOS_ADDRESS = FE_horposition;
 
 		// fix function scaling...
 		*(float*)FE_FUNCTIONS_YSCALE_ADDRESS = 1 / (resY / 600.0);
@@ -568,6 +684,9 @@ int InitRenderCaps()
 	aspect = (float)resX / (float)resY;
 	aspect_diff = (float)FOUR_BY_THREE_ASPECT / aspect;
 
+	resX_600height = aspect * 600;
+	xscale_800 = resX_600height / 800;
+
 	return 0;
 }
 
@@ -576,7 +695,7 @@ int InitConfig()
 	CIniReader inireader("");
 	const char* InputDirString = inireader.ReadString("HP2WSFix", "SaveDir", "save");
 	bEnableConsole = inireader.ReadInteger("HP2WSFix", "EnableConsole", 0);
-	bFixHUD = inireader.ReadInteger("HP2WSFix", "FixHUD", 1);
+	FixHUD = inireader.ReadInteger("HP2WSFix", "FixHUD", 1);
 	RenderMemorySize = inireader.ReadInteger("HP2WSFix", "RenderMemorySize", 0x732000);
 
 	//if (InputDirString && (InputDirString[0] != '0')) // 09/2019 - BROKEN FEATURE - game nulls the pointer at 83C024 because reasons..
@@ -645,16 +764,16 @@ void InjectRes()
 	injector::WriteMemory<float>(0x6639F0, (float)resX, true);
 	injector::WriteMemory<float>(0x6639F4, (float)resY, true);
 
+	// METHOD 2 - FIX Y FE SCALING BY CHANGING SCALING FACTOR
+	injector::WriteMemory<float>(0x00445BE3, aspect_diff, true); // FE 3D map actor Y scale
+	injector::WriteMemory<float>(0x0044D59D, aspect_diff, true); // FE car actor Y scale
+	injector::WriteMemory<float>(0x0049C3F3, aspect_diff, true); // FE 3D event tree actor Y scale
+
 	// GUI hax
-	if (bFixHUD)
+	if (FixHUD)
 	{
 		injector::WriteMemory<float>(0x45A8EC, (float)resX, true);
 		injector::WriteMemory<float>(0x45A8F3, (float)resY, true);
-
-		// METHOD 2 - FIX Y FE SCALING BY CHANGING SCALING FACTOR
-		injector::WriteMemory<float>(0x00445BE3, aspect_diff, true); // FE 3D map actor Y scale
-		injector::WriteMemory<float>(0x0044D59D, aspect_diff, true); // FE car actor Y scale
-		injector::WriteMemory<float>(0x0049C3F3, aspect_diff, true); // FE 3D event tree actor Y scale
 	}
 }
 
@@ -738,9 +857,15 @@ int InitInjector()
 		//injector::WriteMemory<char>(0x55DDE4, 3, true);
 
 	// GUI sub_595440
-	if (bFixHUD)
+	if (FixHUD)
 	{
 		injector::MakeCALL(0x0045A8DC, sub_59B840_hook, true);
+
+		if (FixHUD > 1)
+		{
+			injector::MakeCALL(0x0059410A, sub_59B840_hook_2, true);
+			injector::MakeCALL(0x00593FEE, sub_59B6E0_hook, true);
+		}
 	//	injector::WriteMemory<int>(0x0065ECF8, (int)&sub_463090_hook, true);
 	//	//injector::WriteMemory<int>(0x463140, (int)&FE_horscale, true);
 	//	//injector::WriteMemory<int>(0x5953D0, (int)&FE_horscale, true);
@@ -756,10 +881,6 @@ int InitInjector()
 	//		injector::MakeCALL(0x463090 + 0x360, sub_595390, true);
 	//		injector::MakeCALL(0x463610 + 0x4F, sub_595390, true); // vectorized FE graphics
 	//		injector::MakeCALL(0x49C2C0 + 0x79, sub_595390_3Dhook, true); // affects FE 3D event tree actor rendering
-			// METHOD 2 - FIX Y FE SCALING BY CHANGING SCALING FACTOR
-			injector::WriteMemory<float>(0x00445BE3, aspect_diff, true); // FE 3D map actor Y scale
-			injector::WriteMemory<float>(0x0044D59D, aspect_diff, true); // FE car actor Y scale
-			injector::WriteMemory<float>(0x0049C3F3, aspect_diff, true); // FE 3D event tree actor Y scale
 	//	
 	injector::MakeCALL(0x00462FDF, sub_5954A0, true);
 	injector::MakeCALL(0x00463501, sub_5954A0, true);
@@ -892,6 +1013,13 @@ int InitInjector()
 	injector::MakeJMP(0x00538140, printf, true);
 
 	// testing
+	// SimGUIInterface
+	//injector::MakeNOP(0x0045AC94, 5, true);
+	//injector::MakeNOP(0x0045ACCC, 5, true);
+	//injector::MakeCALL(0x005A15A4, FE_CursorPos, true);
+	//injector::WriteMemory<int>(0x00604A95, (int)&testvarX, true);
+	//injector::WriteMemory<int>(0x00604AB7, (int)&testvarY, true);
+	//injector::WriteMemory<int>(0x00604ADD, (int)&testvarY, true);
 	//injector::MakeNOP(0x00537FD3, 5, true);
 
 	return 0;

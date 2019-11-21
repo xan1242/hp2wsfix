@@ -24,10 +24,13 @@
 #define FE_FUNCTIONS_XSCALE_ADDRESS 0x006C2DB0
 #define FE_FUNCTIONS_YSCALE_ADDRESS 0x006C2DB4
 
+#define FOUR_BY_THREE_ASPECT 1.3333333333333333333333333333333
+
 volatile int resX = 1280;
 volatile int resY = 720;
 volatile float resX_43f = 960.0;
 volatile float aspect;
+volatile float aspect_diff = 0.75;
 
 
 char UserDir[255];
@@ -94,6 +97,38 @@ struct bMatrix4
 	struct bVector4 v2;
 	struct bVector4 v3;
 };
+
+int __stdcall sscanf_hook(const char* str, const char* Format, ...)
+{
+	va_list ArgList;
+	int Result = 0;
+
+	int topX = 0;
+	int topY = 0;
+	int botX = 0;
+	int botY = 0;
+
+	__crt_va_start(ArgList, Format);
+	Result = vsscanf(str, Format, ArgList);
+	__crt_va_end(ArgList);
+
+	__crt_va_start(ArgList, Format);
+	topX = __crt_va_arg(ArgList, int);
+	topY = __crt_va_arg(ArgList, int);
+	botX = __crt_va_arg(ArgList, int);
+	botY = __crt_va_arg(ArgList, int);
+	__crt_va_end(ArgList);
+
+	//*(int*)topX += testvarX;
+	//if (*(int*)botX == 800)
+	//	*(int*)botX = resX;
+	//*(int*)botX *= TEST_XSCALE;
+
+	printf("GUI.mBorders: [ %d , %d ] %d , %d\nTESTVAR_X: %x\n", *(int*)topX, *(int*)topY, *(int*)botX, *(int*)botY, &testvarX);
+
+
+	return Result;
+}
 
 void GetDesktopRes(volatile int* desktop_resX, volatile int* desktop_resY)
 {
@@ -531,6 +566,12 @@ int InitRenderCaps()
 	rendercaps.WriteInteger("GraphicsFE", "Stencil", rendercaps.ReadInteger("Graphics", "Stencil", 8));
 
 	aspect = (float)resX / (float)resY;
+	aspect_diff = (float)FOUR_BY_THREE_ASPECT / aspect;
+
+	// METHOD 2 - FIX Y FE SCALING BY CHANGING SCALING FACTOR
+	injector::WriteMemory<float>(0x00445BE3, aspect_diff, true); // FE 3D map actor Y scale
+	injector::WriteMemory<float>(0x0044D59D, aspect_diff, true); // FE car actor Y scale
+	injector::WriteMemory<float>(0x0049C3F3, aspect_diff, true); // FE 3D event tree actor Y scale
 
 	return 0;
 }
@@ -696,7 +737,7 @@ int InitInjector()
 		//injector::WriteMemory<int>(0x55DDE8, (int)&EAGL_Vertex_malloc, true);
 		//injector::WriteMemory<char>(0x55DDE4, 3, true);
 
-	// GUI hax
+	// GUI sub_595440
 	if (bFixHUD)
 	{
 		injector::MakeCALL(0x0045A8DC, sub_59B840_hook, true);
@@ -708,13 +749,17 @@ int InitInjector()
 	//	//injector::WriteMemory<int>(0x0046318B, (int)&FE_horscale, true); // stretches font graphics
 	//	//injector::WriteMemory<int>(0x59546D, (int)&FE_horscale, true); // stretches graphics
 	//
-			injector::MakeCALL(0x445AB0 + 0x79, sub_595390_3Dhook, true); // affects FE 3D map actor rendering
-			injector::MakeCALL(0x44D440 + 0x7B, sub_595390_3Dhook, true); // affects FE car actor rendering
-	//		injector::MakeCALL(0x460660 + 0x42, sub_595390, true);
+	//		injector::MakeCALL(0x445AB0 + 0x79, sub_595390_3Dhook, true); // affects FE 3D map actor rendering
+	//		injector::MakeCALL(0x44D440 + 0x7B, sub_595390_3Dhook, true); // affects FE car actor rendering
+	//		injector::MakeCALL(0x460660 + 0x42, sub_595390, true); // dynamic FE 2D objects?
 	//		injector::MakeCALL(0x463090 + 0x96, sub_595390, true);
 	//		injector::MakeCALL(0x463090 + 0x360, sub_595390, true);
-	//		injector::MakeCALL(0x463610 + 0x4F, sub_595390, true);
-			injector::MakeCALL(0x49C2C0 + 0x79, sub_595390_3Dhook, true); // affects FE 3D event tree actor rendering
+	//		injector::MakeCALL(0x463610 + 0x4F, sub_595390, true); // vectorized FE graphics
+	//		injector::MakeCALL(0x49C2C0 + 0x79, sub_595390_3Dhook, true); // affects FE 3D event tree actor rendering
+			// METHOD 2 - FIX Y FE SCALING BY CHANGING SCALING FACTOR
+			injector::WriteMemory<float>(0x00445BE3, aspect_diff, true); // FE 3D map actor Y scale
+			injector::WriteMemory<float>(0x0044D59D, aspect_diff, true); // FE car actor Y scale
+			injector::WriteMemory<float>(0x0049C3F3, aspect_diff, true); // FE 3D event tree actor Y scale
 	//	
 	injector::MakeCALL(0x00462FDF, sub_5954A0, true);
 	injector::MakeCALL(0x00463501, sub_5954A0, true);
@@ -839,6 +884,9 @@ int InitInjector()
 
 	// X pos
 		injector::MakeNOP(0x00595324, 6, true);
+
+	// sscanf border hook
+		//injector::MakeCALL(0x0059B88C, sscanf_hook, true);
 
 	}
 	injector::MakeJMP(0x00538140, printf, true);

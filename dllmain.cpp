@@ -357,7 +357,7 @@ bVector4* __cdecl sub_46B470(bVector4 *vector, float X, float Y, float UnkX, flo
 }
 
 
-int __cdecl sub_595390_3Dhook(int a1, int a2)
+int __cdecl sub_595390_3Dhook(int a1, int a2) // NOT SURE IF ASPECT RATIO IS CORRECT IN THIS ONE!!!
 {
   float v8; // [sp+1Ch] [bp+Ch]@1
   float v9; // [sp+1Ch] [bp+Ch]@1
@@ -708,13 +708,13 @@ int InitInjector()
 	//	//injector::WriteMemory<int>(0x0046318B, (int)&FE_horscale, true); // stretches font graphics
 	//	//injector::WriteMemory<int>(0x59546D, (int)&FE_horscale, true); // stretches graphics
 	//
-	//		injector::MakeCALL(0x445AB0 + 0x79, sub_595390, true);
-	//		injector::MakeCALL(0x44D440 + 0x7B, sub_595390, true);
+			injector::MakeCALL(0x445AB0 + 0x79, sub_595390_3Dhook, true); // affects FE 3D map actor rendering
+			injector::MakeCALL(0x44D440 + 0x7B, sub_595390_3Dhook, true); // affects FE car actor rendering
 	//		injector::MakeCALL(0x460660 + 0x42, sub_595390, true);
 	//		injector::MakeCALL(0x463090 + 0x96, sub_595390, true);
 	//		injector::MakeCALL(0x463090 + 0x360, sub_595390, true);
 	//		injector::MakeCALL(0x463610 + 0x4F, sub_595390, true);
-			injector::MakeCALL(0x49C2C0 + 0x79, sub_595390_3Dhook, true);
+			injector::MakeCALL(0x49C2C0 + 0x79, sub_595390_3Dhook, true); // affects FE 3D event tree actor rendering
 	//	
 	injector::MakeCALL(0x00462FDF, sub_5954A0, true);
 	injector::MakeCALL(0x00463501, sub_5954A0, true);

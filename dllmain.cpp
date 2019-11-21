@@ -70,6 +70,15 @@ struct UnkClass1
 	int y;
 };
 
+struct UnkClass2
+{
+	void* vtable;
+	float y1;
+	float x1;
+	float x2;
+	float y2;
+};
+
 struct bVector4
 {
 	float x;
@@ -156,11 +165,27 @@ int __cdecl sub_5954A0(int a1, int a2)
 	float v10; // [sp+1Ch] [bp+Ch]@1
 	float v11; // [sp+1Ch] [bp+Ch]@1
 
-	v8 = (double)(*(int*)(a2 + 4) + *(int*)(a2 + 16)) * *(float*)FE_FUNCTIONS_YSCALE_ADDRESS - *(float*)FE_YPOS_ADDRESS;
-	v9 = (double)(*(int*)(a2 + 8) + *(int*)(a2 + 12)) * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS - *(float*)FE_XPOS_ADDRESS;
+	//float X_scale = testvarX;
+	//float X_pos = testvarY;
 
+	//float X_scale = *(float*)FE_FUNCTIONS_XSCALE_ADDRESS;
+	//float X_pos = *(float*)FE_XPOS_ADDRESS;
+
+	v8 = (double)(*(int*)(a2 + 4) + *(int*)(a2 + 16)) * *(float*)FE_FUNCTIONS_YSCALE_ADDRESS - *(float*)FE_YPOS_ADDRESS;
 	v10 = (double)*(signed int *)(a2 + 4) * *(float*)FE_FUNCTIONS_YSCALE_ADDRESS - *(float*)FE_YPOS_ADDRESS;
-	v11 = (double)*(signed int *)(a2 + 8) * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS - *(float*)FE_XPOS_ADDRESS;
+
+	//v9 = (double)(*(int*)(a2 + 8) + *(int*)(a2 + 12)) * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS - *(float*)FE_XPOS_ADDRESS;
+	//v11 = (double)*(signed int *)(a2 + 8) * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS - *(float*)FE_XPOS_ADDRESS;
+
+	//v9 = (double)(*(int*)(a2 + 8) + *(int*)(a2 + 12)) * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS - (*(float*)FE_XPOS_ADDRESS / *(float*)FE_XSCALE_ADDRESS);
+	//v11 = (double)*(signed int *)(a2 + 8) * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS - (*(float*)FE_XPOS_ADDRESS / *(float*)FE_XSCALE_ADDRESS);
+
+	//v9 = (double)(*(int*)(a2 + 8) + *(int*)(a2 + 12)) * X_scale - X_pos;
+	//v11 = (double)*(signed int *)(a2 + 8) * X_scale - X_pos;
+
+	// the subtraction by the FE X position causes weird text bugs... removing that fixes text
+	v9 = (double)(*(int*)(a2 + 8) + *(int*)(a2 + 12)) * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS;
+	v11 = (double)*(signed int *)(a2 + 8) * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS;
 
 	*(int*)(a1 + 8) = (int)v11;
 	*(int*)(a1 + 12) = (int)(v9 - v11);
@@ -170,12 +195,14 @@ int __cdecl sub_5954A0(int a1, int a2)
 	return a1;
 }
 
+
+
 UnkClass1* __cdecl FE_CursorPos(UnkClass1* out, UnkClass1* in)
 {
 	float v5;
 	float v6;
 
-	//printf("sub_595550 X: %d | Y: %d | TESTVAR_X: %X\n", (*in).x, (*in).y, &testvarX);
+	//printf("sub_595550 X: %d | Y: %d | TESTVAR_X: %X | TESTVAR_Y: %X\n", (*in).x, (*in).y, &testvarX, &testvarY);
 
 	//v6 = (*in).x/* * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS */- 480.0/* - *(float*)FE_XPOS_ADDRESS*/;
 
@@ -183,7 +210,10 @@ UnkClass1* __cdecl FE_CursorPos(UnkClass1* out, UnkClass1* in)
 	//v6 = (*in).x - ((resX - 800.0) / 2.0);
 
 	// VARIANT 2 - scale the functions across the screenspace (kinda broken but works mostly)
-	v6 = (*in).x * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS - (*(float*)FE_XPOS_ADDRESS - ((*(float*)FE_XPOS_ADDRESS / 2) - 32.0));
+	// old
+	//v6 = (*in).x * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS - (*(float*)FE_XPOS_ADDRESS - ((*(float*)FE_XPOS_ADDRESS / 2) - 32.0));
+	// new - seems to work flawlessly
+	v6 = (*in).x * *(float*)FE_FUNCTIONS_XSCALE_ADDRESS - (*(float*)FE_XPOS_ADDRESS / *(float*)FE_XSCALE_ADDRESS);
 
 	v5 = (*in).y * *(float*)FE_FUNCTIONS_YSCALE_ADDRESS - *(float*)FE_YPOS_ADDRESS;
 
@@ -335,10 +365,21 @@ int __cdecl sub_595390_3Dhook(int a1, int a2)
   float v11; // [sp+1Ch] [bp+Ch]@1
 
   // THIS NEEDS FIXING
-  float Y_scale = 1;
-  float Y_pos = (resY - 600.0) / 2; 
+  //float Y_scale = *(float*)FE_YSCALE_ADDRESS + testvarX;
+  //float Y_pos = ((resY - 600.0) / 2) + testvarY;
+  float Y_scale = resY / 800.0;
+  float Y_pos = resY / 8;
+  
+  // hax for 21:9 or 64:27
+  if (aspect >= (21.0 / 9.0))
+  {
+	  Y_scale = 1;
+	  Y_pos = resY / 4.5;
+  }
 
-  //printf("TESTVAR_X: %x | TESTVAR_Y = %x\n", &testvarX, &testvarY);
+ // float Y_scale = testvarX;
+ // float Y_pos = testvarY;
+ // printf("TESTVAR_X: %x | TESTVAR_Y = %x\n", &testvarX, &testvarY);
 
   v8 = (double)(*(int*)(a2 + 4) + *(int*)(a2 + 16)) * Y_scale + Y_pos;
   v10 = (double)*(int *)(a2 + 4) * Y_scale + Y_pos;
@@ -360,6 +401,8 @@ int __stdcall sub_463090_hook(int unk1, int X, int Y, int unk4, int unk5) // tex
 	unsigned int thethis = 0;
 	_asm mov thethis, ecx
 	//printf("sub_463090( X: %d Y: %d )\n", X, Y);
+	//printf("TESTVAR_X: %x | TESTVAR_Y = %x\n", &testvarX, &testvarY);
+	//X -= testvarX;
 	//X = (int)((float)X * (resX_43f / 800.0)); // this scales almost perfectly
 	//Y = (int)((float)Y * ((float)resY / 600.0));
 	return sub_463090(thethis, unk1, X, Y, unk4, unk5);
@@ -382,39 +425,6 @@ int __stdcall sub_59B840_hook(char *key, unsigned int unk1, unsigned int unk2)
 
 	return retval;
 }
-
-/*int __cdecl sub_5954A0(int a1, int a2)
-{
-	int v2; // eax@1
-	float v8; // [sp+1Ch] [bp+Ch]@1
-	float v9; // [sp+1Ch] [bp+Ch]@1
-	float v10; // [sp+1Ch] [bp+Ch]@1
-	float v11; // [sp+1Ch] [bp+Ch]@1
-
-	//*(int *)(a2 + 4) = (int)(*(int *)(a2 + 4) * TEST_YSCALE);
-	//*(int *)(a2 + 16) = (int)(*(int *)(a2 + 16) * TEST_YSCALE);
-	//
-	//*(int *)(a2 + 8) = (int)(*(int *)(a2 + 8) * TEST_XSCALE);
-	//*(int *)(a2 + 12) = (int)(*(int *)(a2 + 12) * TEST_XSCALE);
-
-	v2 = a2;
-	// vertical
-	v8 = (double)(*(int*)(a2 + 4) + *(int*)(a2 + 16));
-	v10 = (double)*(signed int *)(v2 + 4);
-
-	// horizontal
-	v9 = (double)(*(int*)(v2 + 8) + *(int*)(v2 + 12));
-	v11 = (double)*(signed int *)(v2 + 8);
-
-	*(int*)(a1 + 8) = (int)v11; // horizontal
-	*(int*)(a1 + 12) = (int)(v9 - v11); // horizontal
-	*(int*)(a1 + 4) = (int)v10; // vertical
-	*(int*)(a1 + 16) = (int)(v8 - v10); // vertical
-
-	*(int*)a1 = 0x65E010;
-
-	return a1;
-}*/
 
 int __cdecl sub_595440_null(int a1, int a2)
 {
@@ -706,8 +716,8 @@ int InitInjector()
 	//		injector::MakeCALL(0x463610 + 0x4F, sub_595390, true);
 			injector::MakeCALL(0x49C2C0 + 0x79, sub_595390_3Dhook, true);
 	//	
-	//injector::MakeCALL(0x00462FDF, sub_5954A0, true);
-	//injector::MakeCALL(0x00463501, sub_5954A0, true);
+	injector::MakeCALL(0x00462FDF, sub_5954A0, true);
+	injector::MakeCALL(0x00463501, sub_5954A0, true);
 	//	
 	//		//
 	//		injector::MakeCALL(0x463560 + 0x2F, sub_595440, true);

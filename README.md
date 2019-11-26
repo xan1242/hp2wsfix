@@ -13,6 +13,8 @@ Extract the contents of the .zip file to the game's root directory.
 
 **TEMPORARY** - transfer your save files to the "save" directory in the game's root (this will not be necessary at a later point!)
 
+To test the new FE scaling mode, set FixHUD to 2 in the ini.
+
 # Downloads
 You should be able to download the files necessary in the Releases tab.
 

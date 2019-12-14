@@ -548,486 +548,822 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 	//}
 
 	// fix for hud - this will have to be coded specially for every element that is broken...
-	if (strcmp(CurrentFEElement, "sl1.HudText") == 0)
-	{
-		(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.63;
-		//(*unk1).topX = resX_600height * (1 - (*unk1).topX / resX_600height);
-		//printf("Rendering stats label 1! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
-		//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
-	}
-
-	if (strcmp(CurrentFEElement, "sl2.HudText") == 0)
-	{
-		(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.63;
-		//(*unk1).topX = resX_600height * 0.6;
-		//(*unk1).topX = (*unk1).topX * 0.1;
-		//printf("Rendering stats label 2! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
-		//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
-	}
-
-	if (strcmp(CurrentFEElement, "sl3.HudText") == 0)
-	{
-		(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.63;
-		//(*unk1).topX = resX_600height * 0.6;
-		//(*unk1).topX = (*unk1).topX * 0.1;
-		//printf("Rendering stats label 3! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
-		//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
-	}
-
-	// tach start
-	if (strcmp(CurrentFEShape, "[PC:H_TACH.TPG.PCD] bck1") == 0)
-	{
-		(*unk1).topX /= xscale_800;
-		//printf("Rendering tach! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
-		//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
-		//(*unk1).botX = 0;
-	}
-	if (strcmp(CurrentFEElement, "5500.GSimpleImage") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / -(32.958333333333333333333333333333);
-	}
-	if (strcmp(CurrentFEElement, "6000.GSimpleImage") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / -(46.529411764705882352941176470588);
-	}
-	if (strcmp(CurrentFEElement, "6500.GSimpleImage") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / -(79.1);
-	}
-	if (strcmp(CurrentFEElement, "7000.GSimpleImage") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / -(396);
-	}
-	if (strcmp(CurrentFEElement, "7500.GSimpleImage") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 132;
-	}
-	if (strcmp(CurrentFEElement, "8000.GSimpleImage") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 65.916666666666666666666666666667;
-	}
-	if (strcmp(CurrentFEElement, "8500.GSimpleImage") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 41.631578947368421052631578947368;
-	}
-	if (strcmp(CurrentFEElement, "9000.GSimpleImage") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 30.307692307692307692307692307692;
-	}
-	if (strcmp(CurrentFEElement, "speed.HudText") == 0)
-	{
-		(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * -0.07;
-	}
-	// tach end
-
-	// cuffometer
-	if (strcmp(CurrentFEElement, "cuffo.GWidget") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 26.653846153846153846153846153846;
-	}
-	if (strcmp(CurrentFEElement, "backup.GWidget") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 1.512;
-	}
-	// cuffometer end
-
-	// letterbox scaling
-	if (strcmp(CurrentFEElement, "boxT.GImageBox") == 0)
-	{
-		(*unk1).botY = (600 - (resX_600height / LETTERBOX_ASPECT)) / 2;
-		//printf("Rendering letterbox! %s | ADDRESS BotX: %X\n", CurrentFEElement, &(*unk1).botX);
-		//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
-		//(*unk1).botX = 0;
-	
-	}
-	
-	if (strcmp(CurrentFEElement, "boxB.GImageBox") == 0)
-	{
-		(*unk1).botY = (600 - (resX_600height / LETTERBOX_ASPECT)) / 2;
-		(*unk1).topY += 110 - (*unk1).botY;
-		//printf("Rendering letterbox! %s | ADDRESS BotX: %X\n", CurrentFEElement, &(*unk1).botX);
+	//if (strcmp(CurrentFEElement, "s1.HudText") == 0)
+	//{
+	//	printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 	//	printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
-		//(*unk1).botX = 0;
-	}
-
-	// title screen & load screen
-	// logo
-	if (strcmp(CurrentFEElement, "LOGO.GStaticImage") == 0)
-	{
-		//(*unk1).topX = (resX_600height - (*unk1).botX) / 1.85;
-		//(*unk1).topX = resX_600height * 0.35;
-		//(*unk1).topX = aspect * 159 * FOUR_BY_THREE_ASPECT;
-		(*unk1).botX = 0;
-		(*unk1).botY = 0;
-	}
-	if (strcmp(CurrentFEElement, "logo.GStaticImage") == 0)
-	{
-		//(*unk1).topX = (resX_600height - (*unk1).botX) / 1.85;
-		//(*unk1).topX = resX_600height * 0.35;
-		//(*unk1).topX = aspect * 159 * FOUR_BY_THREE_ASPECT;
-		(*unk1).botX = 0;
-		(*unk1).botY = 0;
-	}
-	if (strcmp(CurrentFEShape, "[PC:S_INTRO.LYR.PCD] nfsl") == 0)
-	{
-		//(*unk1).topX = pow(aspect, 2) * 90;
-		//(*unk1).topX = 435;
-		//(*unk1).topX *= 1 + (aspect - FOUR_BY_THREE_ASPECT); // this formula needs some work
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-
-	if (strcmp(CurrentFEElement, "EATip.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-
-	//if (strcmp(CurrentFEElement, "loadbar.GStaticImage") == 0)
-	//{
-	//	(*unk1).topX = (resX_600height - (*unk1).botX) / 1.7;
+	//	//(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.63;
+	//	//(*unk1).topX = resX_600height * (1 - (*unk1).topX / resX_600height);
+	//	//printf("Rendering stats label 1! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+	//	//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
 	//}
-	//
-	//if (strcmp(CurrentFEElement, "<BAR>.GImageBox") == 0)
-	//{
-	//	(*unk1).topX = (resX_600height - (*unk1).botX) / 2.21;
-	//}
+		if (strcmp(CurrentFEElement, "s1.HudText") == 0)
+		{
+			(*unk1).topX = resX_600height - 82;
+			(*unk1).topY = 2;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
+		if (strcmp(CurrentFEElement, "s2.HudText") == 0)
+		{
+			(*unk1).topX = resX_600height - 82;
+			(*unk1).topY = 19;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			//(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.63;
+			//(*unk1).topX = resX_600height * (1 - (*unk1).topX / resX_600height);
+			//printf("Rendering stats label 1! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
+		if (strcmp(CurrentFEElement, "s3.HudText") == 0)
+		{
+			(*unk1).topX = resX_600height - 82;
+			(*unk1).topY = 36;
+		}
 
-	// backround letterbox scale
-	//if (strcmp(CurrentFEShape, "[PC:S_INTRO.LYR.PCD] back") == 0)
-	//{
-	//	(*unk1).topY = -((resX_600height / INTRO_LETTERBOX_ASPECT) / 2);
-	//	(*unk1).botY = (resX_600height / INTRO_LETTERBOX_ASPECT) + 600;
-	//	//(*unk1).topX = pow(aspect, 2) * 90;
-	//	//(*unk1).topX = 435;
-	//}
-	// title screen end
+		if (strcmp(CurrentFEElement, "sl1.HudText") == 0)
+		{
+			(*unk1).topX = resX_600height - (*unk1).botX - 98;
+			(*unk1).topY = 2;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			//(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.63;
+			//(*unk1).topX = resX_600height * (1 - (*unk1).topX / resX_600height);
+			//printf("Rendering stats label 1! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	// titlebar fix
-	if (strcmp(CurrentFEElement, "ul.GImageBox") == 0)
-	{
-		(*unk1).botX = resX_600height / 2;
-	}
-	if (strcmp(CurrentFEElement, "bl.GImageBox") == 0)
-	{
-		(*unk1).botX = resX_600height / 2;
-	}
-	if (strcmp(CurrentFEElement, "cl.GImageBox") == 0)
-	{
-		(*unk1).botX = resX_600height / 2;
-	}
-	if (strcmp(CurrentFEElement, "ur.GImageBox") == 0)
-	{
-		(*unk1).botX = resX_600height / 2;
-	}
-	if (strcmp(CurrentFEElement, "br.GImageBox") == 0)
-	{
-		(*unk1).botX = resX_600height / 2;
-	}
-	if (strcmp(CurrentFEElement, "cr.GImageBox") == 0)
-	{
-		(*unk1).botX = resX_600height / 2;
-	}
-	// titlebar end
+		if (strcmp(CurrentFEElement, "sl2.HudText") == 0)
+		{
+			(*unk1).topX = resX_600height - (*unk1).botX - 96;
+			(*unk1).topY = 19;
+			//(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.63;
+			//(*unk1).topX = resX_600height * 0.6;
+			//(*unk1).topX = (*unk1).topX * 0.1;
+			//printf("Rendering stats label 2! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	// console fix
-	if (strcmp(CurrentFEElement, "!console.GStaticImage") == 0)
-	{
-		(*unk1).botX = resX_600height * 0.77875;
-	}
-	// console end
+		if (strcmp(CurrentFEElement, "sl3.HudText") == 0)
+		{
+			(*unk1).topX = resX_600height - (*unk1).botX - 97;
+			(*unk1).topY = 36;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			//(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.63;
+			//(*unk1).topX = resX_600height * 0.6;
+			//(*unk1).topX = (*unk1).topX * 0.1;
+			//printf("Rendering stats label 3! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	// button edges
-	if (strcmp(CurrentFEElement, "L0.GImageBox") == 0)
-	{
-		(*unk1).topX /= xscale_800;
-	}
+		if (strcmp(CurrentFEElement, "p1.HudText") == 0)
+		{
+			(*unk1).topX = 16;
+			(*unk1).topY = 0;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "R0.GImageBox") == 0)
-	{
-		(*unk1).topX /= xscale_800;
-	}
+		if (strcmp(CurrentFEElement, "p2.HudText") == 0)
+		{
+			(*unk1).topX = 64;
+			(*unk1).topY = 14;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "L1.GImageBox") == 0)
-	{
-		(*unk1).topX /= xscale_800;
-	}
+		if (strcmp(CurrentFEElement, "score.HudText") == 0)
+		{
+			(*unk1).topX = 0;
+			(*unk1).topY = 64;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "R1.GImageBox") == 0)
-	{
-		(*unk1).topX /= xscale_800;
-	}
-	// FIX THESE TO CENTER OF THE SCREEN
-	if (strcmp(CurrentFEElement, "!H0left.GImageBox") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 9;
-		//(*unk1).topX /= xscale_800;
-	}
+		if (strcmp(CurrentFEElement, "map.HudMap") == 0)
+		{
+			(*unk1).topX = 2;
+			(*unk1).topY = 473;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "!H0rite.GImageBox") == 0)
-	{
-		//(*unk1).topX = (resX_600height - (*unk1).botX) / 1.6875;
-		//(*unk1).topX /= xscale_800;
-	}
+		if (strcmp(CurrentFEElement, "<TEXT>.FlashText") == 0)
+		{
+			if ((*unk1).topX == 0 && (*unk1).topY == 125 && (*unk1).botX == 142 && (*unk1).botY == 12)
+			{
+				(*unk1).topX = 0;
+				(*unk1).topY = -16;
+			}
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "!H1left.GImageBox") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 9;
-		//(*unk1).topX /= xscale_800;
-	}
+		if (strcmp(CurrentFEElement, "bi1.HudStaticArt") == 0)
+		{
+			(*unk1).topX = 2;
+			(*unk1).topY = 2;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "!H1rite.GImageBox") == 0)
-	{
-		//(*unk1).topX = (resX_600height - (*unk1).botX) / 1.6875;
-		//(*unk1).topX /= xscale_800;
-	}
-	// button edges end
+		if (strcmp(CurrentFEElement, "bi2.HudStaticArt") == 0)
+		{
+			(*unk1).topX = 2;
+			(*unk1).topY = 21;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	// options menu
-	//if (strcmp(CurrentFEElement, "<CAR_DETAIL>.CmnSlider") == 0)
-	//{
-	//	(*unk1).botX *= xscale_800;
-	//}
-	// options menu end
+		if (strcmp(CurrentFEElement, "bi3.HudStaticArt") == 0)
+		{
+			(*unk1).topX = 2;
+			(*unk1).topY = 40;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	// main menu stuff
-	if (strcmp(CurrentFEElement, "i_back2.GSimpleImage") == 0)
-	{
-		//(*unk1).topX /= xscale_800;
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-		//(*unk1).topX = resX_600height * 0.35;
-		//(*unk1).topX = aspect * 159 * FOUR_BY_THREE_ASPECT;
-		//(*unk1).botX = 0;
-		//(*unk1).botY = 0;
-		//printf("[%s][%s] GUI.mBorders: [ %d , %d ] %d , %d | ADDRESS: %X\n", CurrentFEShape, CurrentFEElement, (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY, unk1);
-	}
+		if (strcmp(CurrentFEElement, "bt1.HudText") == 0)
+		{
+			(*unk1).topX = 2;
+			(*unk1).topY = 2;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "i_logo.GSimpleImage") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<HotPursuit>.CmnScreenNav") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
+		if (strcmp(CurrentFEElement, "bt2.HudText") == 0)
+		{
+			(*unk1).topX = 2;
+			(*unk1).topY = 21;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "<SingleChallenge>.CmnScreenNav") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
+		if (strcmp(CurrentFEElement, "bt3.HudText") == 0)
+		{
+			(*unk1).topX = 2;
+			(*unk1).topY = 40;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "<Championship>.CmnScreenNav") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
+		// RVM start
+		if (strcmp(CurrentFEElement, "rearview.HudRearView") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+			//(*unk1).topX = 2;
+			(*unk1).topY = 4;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
+		if (strcmp(CurrentFEShape, "[PC:H_MIRROR.TPG.PCD] edge") == 0)
+		{
+			if (strcmp(CurrentFEElement, "i0.GStaticImage") == 0)
+			{
+				(*unk1).topX = -8;
+				(*unk1).topY = -3;
+			}
+			if (strcmp(CurrentFEElement, "i0a.GStaticImage") == 0)
+			{
+				(*unk1).topX = 199;
+				(*unk1).topY = -3;
+			}
+		}
+		// RVM end
 
-	if (strcmp(CurrentFEElement, "<Multiplayer>.CmnScreenNav") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
+		// tach start
 
-	if (strcmp(CurrentFEElement, "<QuickRace>.GButton") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
+		if (strcmp(CurrentFEElement, "digitach.HudTachometer") == 0)
+		{
+			(*unk1).topX = resX_600height - 60;
+			(*unk1).topY += 20; // this will need fixing if we're gonna do 1:1 scaling...
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "<Options>.CmnScreenNav") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
+		if (strcmp(CurrentFEShape, "[PC:H_TACH.TPG.PCD] bck1") == 0)
+		{
+			(*unk1).topX = -72;
+			//(*unk1).topX = ((resX_600height - (*unk1).botX) / 2);
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			//printf("Rendering tach! %s | ADDRESS mBorders: %X\n", CurrentFEElement, unk1);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			//(*unk1).botX = 0;
+		}
+		if (strcmp(CurrentFEElement, "5500.GSimpleImage") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / -(32.958333333333333333333333333333);
+			(*unk1).topX = -24;
+			(*unk1).topY = 36;
+		}
+		if (strcmp(CurrentFEElement, "6000.GSimpleImage") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / -(46.529411764705882352941176470588);
+			(*unk1).topX = -17;
+			(*unk1).topY = 34;
+		}
+		if (strcmp(CurrentFEElement, "6500.GSimpleImage") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / -(79.1);
+			//(*unk1).topX = -7;
+			//(*unk1).topY = 31;
+			(*unk1).topX = -10;
+			(*unk1).topY = 32;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
+		if (strcmp(CurrentFEElement, "7000.GSimpleImage") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / -(396);
+			//(*unk1).topX = 0;
+			//(*unk1).topY = 31;
+			(*unk1).topX = -2;
+			(*unk1).topY = 32;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
+		if (strcmp(CurrentFEElement, "7500.GSimpleImage") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / 132;
+			//(*unk1).topX = 8;
+			//(*unk1).topY = 31;
+			(*unk1).topX = 6;
+			(*unk1).topY = 32;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
+		if (strcmp(CurrentFEElement, "8000.GSimpleImage") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / 65.916666666666666666666666666667;
+			//(*unk1).topX = 14;
+			//(*unk1).topY = 31;
+			(*unk1).topX = 12;
+			(*unk1).topY = 32;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
+		if (strcmp(CurrentFEElement, "8500.GSimpleImage") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / 41.631578947368421052631578947368;
+			//(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 0.04545454545454545454545454545455;
+			//(*unk1).topX = 20;
+			//(*unk1).topY = 32;
+			(*unk1).topX = 19;
+			(*unk1).topY = 34;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
+		if (strcmp(CurrentFEElement, "9000.GSimpleImage") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / 30.307692307692307692307692307692;
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / testvarX;
+			//(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 0.05725190839694656488549618320611;
+			//(*unk1).topX = 27;
+			//(*unk1).topY = 34;
+			(*unk1).topX = 26;
+			(*unk1).topY = 36;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
+		if (strcmp(CurrentFEElement, "speed.HudText") == 0)
+		{
+			(*unk1).topX = -35;
+		}
+		// tach end
 
-	if (strcmp(CurrentFEElement, "p5.FEParticle") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2.5793650793650793650793650793651;
-	}
+		// EA Trax Chyron start
+		if (strcmp(CurrentFEElement, "<ARTIST>.GText") == 0)
+		{
+			(*unk1).topX = 0;
+		}
+		if (strcmp(CurrentFEElement, "<TITLE>.GText") == 0)
+		{
+			(*unk1).topX = 0;
+		}
+		if (strcmp(CurrentFEElement, "<ALBUM>.GText") == 0)
+		{
+			(*unk1).topX = 0;
+		}
+		if (strcmp(CurrentFEElement, "<BRAND>.GText") == 0)
+		{
+			(*unk1).topX = 0;
+		}
+		if (strcmp(CurrentFEElement, "b1.GImageBox") == 0)
+		{
+			if ((*unk1).botX == 175 && (*unk1).botY == 17)
+			{
+				(*unk1).topX = -2;
+			}
+		}
+		if (strcmp(CurrentFEElement, "b2.GImageBox") == 0)
+		{
+			if ((*unk1).botX == 175 && (*unk1).botY == 17)
+			{
+				(*unk1).topX = -2;
+			}
+		}
+		if (strcmp(CurrentFEElement, "a1.GImageBox") == 0)
+		{
+			if ((*unk1).botX == 176 && (*unk1).botY == 71)
+			{
+				(*unk1).topX = -2;
+			}
+		}
+		if (strcmp(CurrentFEElement, "a1b.GImageBox") == 0)
+		{
+			if ((*unk1).botX == 76 && (*unk1).botY == 71)
+			{
+				(*unk1).topX = -78;
+			}
+		}
+		if (strcmp(CurrentFEElement, "b1b.GImageBox") == 0)
+		{
+			if ((*unk1).botX == 76 && (*unk1).botY == 17)
+			{
+				(*unk1).topX = -78;
+			}
+		}
+		if (strcmp(CurrentFEElement, "b2b.GImageBox") == 0)
+		{
+			if ((*unk1).botX == 76 && (*unk1).botY == 17)
+			{
+				(*unk1).topX = -78;
+			}
+		}
+		// EA Trax Chyron end
 
-	if (strcmp(CurrentFEElement, "p5a.FEParticle") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 1.8258426966292134831460674157303;
-	}
+		// cuffometer
+		if (strcmp(CurrentFEElement, "<CUFFOMETER>.WCuffometer") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+			(*unk1).topY = (600 - (*unk1).botY) - 2;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "p3.FEParticle") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 3.3695652173913043478260869565217;
-	}
+		if (strcmp(CurrentFEElement, "<star0>.GStaticImage") == 0)
+		{
+			(*unk1).topX = 26;
+			(*unk1).topY = 16;
+		}
+		if (strcmp(CurrentFEElement, "<star1>.GStaticImage") == 0)
+		{
+			(*unk1).topX = 46;
+			(*unk1).topY = 16;
+		}
+		if (strcmp(CurrentFEElement, "<star2>.GStaticImage") == 0)
+		{
+			(*unk1).topX = 66;
+			(*unk1).topY = 16;
+		}
+		if (strcmp(CurrentFEElement, "<star3>.GStaticImage") == 0)
+		{
+			(*unk1).topX = 87;
+			(*unk1).topY = 16;
+		}
+		if (strcmp(CurrentFEElement, "<star4>.GStaticImage") == 0)
+		{
+			(*unk1).topX = 107;
+			(*unk1).topY = 16;
+		}
 
-	if (strcmp(CurrentFEElement, "p3a.FEParticle") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 1.4168190127970749542961608775137;
-	}
+		if (strcmp(CurrentFEElement, "Reset.FlashText") == 0)
+		{
+			(*unk1).topX = -24;
+			(*unk1).topY = -16;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	if (strcmp(CurrentFEElement, "Back.GButton") == 0 || strcmp(CurrentFEElement, "back.GButton") == 0 || strcmp(CurrentFEElement, "<BACK>.GButton") == 0 || strcmp(CurrentFEElement, "!Back.GText") == 0 || strcmp(CurrentFEElement, "Back.CmnScreenNav") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
+		if (strcmp(CurrentFEElement, "<bar>.ProgressBar") == 0)
+		{
+			(*unk1).topX = 5;
+			(*unk1).topY = 2;
+		}
 
-	if (strcmp(CurrentFEElement, "Next.GButton") == 0 || strcmp(CurrentFEElement, "next.GButton") == 0 || strcmp(CurrentFEElement, "<NEXT>.GButton") == 0 || strcmp(CurrentFEElement, "!Next.GText" ) == 0 || strcmp(CurrentFEElement, "Next.CmnScreenNav") == 0)
-	{
-		(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.47;
-	}
+		if (strcmp(CurrentFEElement, "<bar2>.ProgressBar") == 0)
+		{
+			(*unk1).topX = 5;
+			(*unk1).topY = 2;
+		}
 
-	// main menu stuff end
+		if (strcmp(CurrentFEElement, "i1.GImageBox") == 0)
+		{
+			if ((*unk1).botX == 75 && (*unk1).botY == 14)
+			{
+				(*unk1).topX = 47;
+				(*unk1).topY = 20;
+			}
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+		}
 
-	// car select
-	if (strcmp(CurrentFEElement, "<CAR>.CarWidget") == 0)
-	{
-		//(*unk1).botX = resX;
-		//(*unk1).botY = resY;
-		//(*unk1).topX = testvarX;
-		////(*unk1).topY = testvarY;
-		(*unk1).topX = resX / 21.33334;
-		if ((resX / 1280.0) < 2.0) // not sure when it's negative exactly
-			(*unk1).topX = -(*unk1).topX;
+		// cuffometer end
+
+		// letterbox scaling
+		if (strcmp(CurrentFEElement, "boxT.GImageBox") == 0)
+		{
+			(*unk1).botY = (600 - (resX_600height / LETTERBOX_ASPECT)) / 2;
+			//printf("Rendering letterbox! %s | ADDRESS BotX: %X\n", CurrentFEElement, &(*unk1).botX);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			//(*unk1).botX = 0;
 		
-		////(*unk1).topX = -(*unk1).topX;
-		////(*unk1).topY = -(resY * 0.0694444445);
-		////(*unk1).topY = -(*unk1).topY;
-		//printf("TOPX: %d\nTOPY: %d\n", (*unk1).topX, (*unk1).topY);
-	}
+		}
+		
+		if (strcmp(CurrentFEElement, "boxB.GImageBox") == 0)
+		{
+			(*unk1).botY = (600 - (resX_600height / LETTERBOX_ASPECT)) / 2;
+			(*unk1).topY += 110 - (*unk1).botY;
+			//printf("Rendering letterbox! %s | ADDRESS BotX: %X\n", CurrentFEElement, &(*unk1).botX);
+		//	printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			//(*unk1).botX = 0;
+		}
 
-	if (strcmp(CurrentFEElement, "<Showcase>.GButton") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
+		// title screen & load screen
+		// logo
+		if (strcmp(CurrentFEElement, "LOGO.GStaticImage") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / 1.85;
+			//(*unk1).topX = resX_600height * 0.35;
+			//(*unk1).topX = aspect * 159 * FOUR_BY_THREE_ASPECT;
+			(*unk1).botX = 0;
+			(*unk1).botY = 0;
+		}
+		if (strcmp(CurrentFEElement, "logo.GStaticImage") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / 1.85;
+			//(*unk1).topX = resX_600height * 0.35;
+			//(*unk1).topX = aspect * 159 * FOUR_BY_THREE_ASPECT;
+			(*unk1).botX = 0;
+			(*unk1).botY = 0;
+		}
+		if (strcmp(CurrentFEShape, "[PC:S_INTRO.LYR.PCD] nfsl") == 0)
+		{
+			//(*unk1).topX = pow(aspect, 2) * 90;
+			//(*unk1).topX = 435;
+			//(*unk1).topX *= 1 + (aspect - FOUR_BY_THREE_ASPECT); // this formula needs some work
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
 
-	if (strcmp(CurrentFEElement, "<CAR_IL>.HPImgList") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
+		if (strcmp(CurrentFEElement, "EATip.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
 
-	//if (strcmp(CurrentFEElement, "<btl>.RolloverButton") == 0)
-	//{
-	//	//(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	//	//(*unk1).topX = (resX_600height - (*unk1).botX) / -26.034482758620689655172413793103;
-	//	//(*unk1).botX = 0;
-	//	//(*unk1).botY = 0;
-	//}
+		//if (strcmp(CurrentFEElement, "loadbar.GStaticImage") == 0)
+		//{
+		//	(*unk1).topX = (resX_600height - (*unk1).botX) / 1.7;
+		//}
+		//
+		//if (strcmp(CurrentFEElement, "<BAR>.GImageBox") == 0)
+		//{
+		//	(*unk1).topX = (resX_600height - (*unk1).botX) / 2.21;
+		//}
 
-	// car select end
+		// backround letterbox scale
+		//if (strcmp(CurrentFEShape, "[PC:S_INTRO.LYR.PCD] back") == 0)
+		//{
+		//	(*unk1).topY = -((resX_600height / INTRO_LETTERBOX_ASPECT) / 2);
+		//	(*unk1).botY = (resX_600height / INTRO_LETTERBOX_ASPECT) + 600;
+		//	//(*unk1).topX = pow(aspect, 2) * 90;
+		//	//(*unk1).topX = 435;
+		//}
+		// title screen end
+
+		// titlebar fix
+		if (strcmp(CurrentFEElement, "ul.GImageBox") == 0)
+		{
+			(*unk1).botX = resX_600height / 2;
+		}
+		if (strcmp(CurrentFEElement, "bl.GImageBox") == 0)
+		{
+			(*unk1).botX = resX_600height / 2;
+		}
+		if (strcmp(CurrentFEElement, "cl.GImageBox") == 0)
+		{
+			(*unk1).botX = resX_600height / 2;
+		}
+		if (strcmp(CurrentFEElement, "ur.GImageBox") == 0)
+		{
+			(*unk1).botX = resX_600height / 2;
+		}
+		if (strcmp(CurrentFEElement, "br.GImageBox") == 0)
+		{
+			(*unk1).botX = resX_600height / 2;
+		}
+		if (strcmp(CurrentFEElement, "cr.GImageBox") == 0)
+		{
+			(*unk1).botX = resX_600height / 2;
+		}
+		// titlebar end
+
+		// console fix
+		if (strcmp(CurrentFEElement, "!console.GStaticImage") == 0)
+		{
+			(*unk1).botX = resX_600height * 0.77875;
+		}
+		// console end
+
+		// button edges
+		if (strcmp(CurrentFEElement, "L0.GImageBox") == 0)
+		{
+			(*unk1).topX /= xscale_800;
+		}
+
+		if (strcmp(CurrentFEElement, "R0.GImageBox") == 0)
+		{
+			(*unk1).topX /= xscale_800;
+		}
+
+		if (strcmp(CurrentFEElement, "L1.GImageBox") == 0)
+		{
+			(*unk1).topX /= xscale_800;
+		}
+
+		if (strcmp(CurrentFEElement, "R1.GImageBox") == 0)
+		{
+			(*unk1).topX /= xscale_800;
+		}
+		// FIX THESE TO CENTER OF THE SCREEN
+		if (strcmp(CurrentFEElement, "!H0left.GImageBox") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 9;
+			//(*unk1).topX /= xscale_800;
+		}
+
+		if (strcmp(CurrentFEElement, "!H0rite.GImageBox") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / 1.6875;
+			//(*unk1).topX /= xscale_800;
+		}
+
+		if (strcmp(CurrentFEElement, "!H1left.GImageBox") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 9;
+			//(*unk1).topX /= xscale_800;
+		}
+
+		if (strcmp(CurrentFEElement, "!H1rite.GImageBox") == 0)
+		{
+			//(*unk1).topX = (resX_600height - (*unk1).botX) / 1.6875;
+			//(*unk1).topX /= xscale_800;
+		}
+		// button edges end
+
+		// options menu
+		//if (strcmp(CurrentFEElement, "<CAR_DETAIL>.CmnSlider") == 0)
+		//{
+		//	(*unk1).botX *= xscale_800;
+		//}
+		// options menu end
+
+		// main menu stuff
+		if (strcmp(CurrentFEElement, "i_back2.GSimpleImage") == 0)
+		{
+			//(*unk1).topX /= xscale_800;
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+			//(*unk1).topX = resX_600height * 0.35;
+			//(*unk1).topX = aspect * 159 * FOUR_BY_THREE_ASPECT;
+			//(*unk1).botX = 0;
+			//(*unk1).botY = 0;
+			//printf("[%s][%s] GUI.mBorders: [ %d , %d ] %d , %d | ADDRESS: %X\n", CurrentFEShape, CurrentFEElement, (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY, unk1);
+		}
+
+		if (strcmp(CurrentFEElement, "i_logo.GSimpleImage") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<HotPursuit>.CmnScreenNav") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+
+		if (strcmp(CurrentFEElement, "<TopCop>.CmnScreenNav") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+
+		if (strcmp(CurrentFEElement, "<Championship>.CmnScreenNav") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+
+		if (strcmp(CurrentFEElement, "<SingleChallenge>.CmnScreenNav") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+
+		if (strcmp(CurrentFEElement, "<Multiplayer>.CmnScreenNav") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+
+		if (strcmp(CurrentFEElement, "<QuickRace>.GButton") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+
+		if (strcmp(CurrentFEElement, "<Options>.CmnScreenNav") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+
+		if (strcmp(CurrentFEElement, "p5.FEParticle") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2.5793650793650793650793650793651;
+		}
+
+		if (strcmp(CurrentFEElement, "p5a.FEParticle") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 1.8258426966292134831460674157303;
+		}
+
+		if (strcmp(CurrentFEElement, "p3.FEParticle") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 3.3695652173913043478260869565217;
+		}
+
+		if (strcmp(CurrentFEElement, "p3a.FEParticle") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 1.4168190127970749542961608775137;
+		}
+
+		if (strcmp(CurrentFEElement, "Back.GButton") == 0 || strcmp(CurrentFEElement, "back.GButton") == 0 || strcmp(CurrentFEElement, "<BACK>.GButton") == 0 || strcmp(CurrentFEElement, "!Back.GText") == 0 || strcmp(CurrentFEElement, "Back.CmnScreenNav") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+
+		if (strcmp(CurrentFEElement, "Next.GButton") == 0 || strcmp(CurrentFEElement, "next.GButton") == 0 || strcmp(CurrentFEElement, "<NEXT>.GButton") == 0 || strcmp(CurrentFEElement, "!Next.GText" ) == 0 || strcmp(CurrentFEElement, "Next.CmnScreenNav") == 0)
+		{
+			(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.47;
+		}
+
+		// main menu stuff end
+
+		// car select
+		if (strcmp(CurrentFEElement, "<CAR>.CarWidget") == 0)
+		{
+			//(*unk1).botX = resX;
+			//(*unk1).botY = resY;
+			//(*unk1).topX = testvarX;
+			////(*unk1).topY = testvarY;
+			(*unk1).topX = resX / 21.33334;
+			if ((resX / 1280.0) < 2.0) // not sure when it's negative exactly
+				(*unk1).topX = -(*unk1).topX;
+			
+			////(*unk1).topX = -(*unk1).topX;
+			////(*unk1).topY = -(resY * 0.0694444445);
+			////(*unk1).topY = -(*unk1).topY;
+			//printf("TOPX: %d\nTOPY: %d\n", (*unk1).topX, (*unk1).topY);
+		}
+
+		if (strcmp(CurrentFEElement, "<Showcase>.GButton") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+
+		if (strcmp(CurrentFEElement, "<CAR_IL>.HPImgList") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+
+		//if (strcmp(CurrentFEElement, "<btl>.RolloverButton") == 0)
+		//{
+		//	//(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		//	//(*unk1).topX = (resX_600height - (*unk1).botX) / -26.034482758620689655172413793103;
+		//	//(*unk1).botX = 0;
+		//	//(*unk1).botY = 0;
+		//}
+
+		// car select end
 
 
-	// track select
-	if (strcmp(CurrentFEElement, "<Descrip>.GButton") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<tdir>.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<lock>.GStaticImage") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<Cost>.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	//if (strcmp(CurrentFEElement, "TRCK.ActorWidget") == 0)
-	//{
-	//	(*unk1).botX = 800;
-	//}
-	// track select end
+		// track select
+		if (strcmp(CurrentFEElement, "<Descrip>.GButton") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<tdir>.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<lock>.GStaticImage") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<Cost>.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		//if (strcmp(CurrentFEElement, "TRCK.ActorWidget") == 0)
+		//{
+		//	(*unk1).botX = 800;
+		//}
+		// track select end
 
-	// event tree
-	if (strcmp(CurrentFEElement, "<EVENT_OBJECTIVE>.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<EVENT_STATUS>.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<EVENT_CAR>.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<EVENT_OPPONENTS>.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<EVENT_LAPS>.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<EVENT_TRACKS>.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<REWARD>.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	//if (strcmp(CurrentFEElement, "<TREE>.TreeWidget") == 0)
-	//{
-	//	(*unk1).botX = 800;
-	//	(*unk1).topX = 280;
-	//}
-	//if (strcmp(CurrentFEElement, "<TREE_DATA>.GText") == 0)
-	//{
-	//	(*unk1).botX = 800;
-	//	(*unk1).topX = 280;
-	//}
-	// event tree end
+		// event tree
+		if (strcmp(CurrentFEElement, "<EVENT_OBJECTIVE>.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<EVENT_STATUS>.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<EVENT_CAR>.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<EVENT_OPPONENTS>.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<EVENT_LAPS>.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<EVENT_TRACKS>.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<REWARD>.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		//if (strcmp(CurrentFEElement, "<TREE>.TreeWidget") == 0)
+		//{
+		//	(*unk1).botX = 800;
+		//	(*unk1).topX = 280;
+		//}
+		//if (strcmp(CurrentFEElement, "<TREE_DATA>.GText") == 0)
+		//{
+		//	(*unk1).botX = 800;
+		//	(*unk1).topX = 280;
+		//}
+		// event tree end
 
-	// starting/ending grid
-	if (strcmp(CurrentFEElement, "GRID.GWidget") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<StartRace>.GButton") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "field.GWidget") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<LIST>.GListBox") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<RESULTS>.GListBox") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "<TRACK>.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "titlebar.GImageBox") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-	}
-	if (strcmp(CurrentFEElement, "h2.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 2.9158878504672897196261682242991;
-	}
-	if (strcmp(CurrentFEElement, "h3.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 1.4846153846153846153846153846154;
-	}
-	if (strcmp(CurrentFEElement, "h4.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 1.34765625;
-	}
-	// starting/ending grid end
+		// starting/ending grid
+		if (strcmp(CurrentFEElement, "GRID.GWidget") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<StartRace>.GButton") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "field.GWidget") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<LIST>.GListBox") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<RESULTS>.GListBox") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "<TRACK>.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "titlebar.GImageBox") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+		}
+		if (strcmp(CurrentFEElement, "h2.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2.9158878504672897196261682242991;
+		}
+		if (strcmp(CurrentFEElement, "h3.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 1.4846153846153846153846153846154;
+		}
+		if (strcmp(CurrentFEElement, "h4.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 1.34765625;
+		}
+		// starting/ending grid end
 
-	// misc. stuff
-	if (strcmp(CurrentFEElement, "BNK1.GText") == 0)
-	{
-		(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.63;
-	}
+		// misc. stuff
+		if (strcmp(CurrentFEElement, "BNK1.GText") == 0)
+		{
+			(*unk1).topX = ((resX_600height - (*unk1).botX) / 2) * 1.63;
+		}
 
-	if (strcmp(CurrentFEElement, "tm.GText") == 0)
-	{
-		(*unk1).topX = (resX_600height - (*unk1).botX) / 1.3602150537634408602150537634409;
-	}
-	// misc. stuff end
-	//printf("[%s][%s] GUI.mBorders: [ %d , %d ] %d , %d | ADDRESS: %X\n", CurrentFEShape, CurrentFEElement, (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY, unk1);
-	CurrentFEShape[0] = 0;
+		if (strcmp(CurrentFEElement, "tm.GText") == 0)
+		{
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 1.3602150537634408602150537634409;
+		}
+		// misc. stuff end
+		//printf("[%s][%s] GUI.mBorders: [ %d , %d ] %d , %d | ADDRESS: %X\n", CurrentFEShape, CurrentFEElement, (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY, unk1);
+		CurrentFEShape[0] = 0;
 
-	//printf("sub_59B840: %X %X %X %X %X %X %X\n", *(int*)(thethis), *(int*)(thethis + 4), *(int*)(thethis + 8), *(int*)(thethis + 12), *(int*)(thethis + 16), *(int*)(thethis + 20), *(int*)(thethis + 24));
-	
-	//printf("%s\n", *(int*)(thethis + 8));
+		//printf("sub_59B840: %X %X %X %X %X %X %X\n", *(int*)(thethis), *(int*)(thethis + 4), *(int*)(thethis + 8), *(int*)(thethis + 12), *(int*)(thethis + 16), *(int*)(thethis + 20), *(int*)(thethis + 24));
+		
+		//printf("%s\n", *(int*)(thethis + 8));
 	}
 	return retval;
 }
@@ -1324,6 +1660,14 @@ int InitInjector()
 			injector::MakeCALL(0x00593FEE, sub_59B6E0_hook, true);
 			injector::MakeCALL(0x00596F6A, sub_59BAE0_hook, true);
 			injector::MakeCALL(0x005980D8, sub_59BAE0_hook, true);
+
+			// cuffometer position fix - disable writes to its mBounds
+			// X
+			injector::MakeNOP(0x453C95, 3, true);
+			injector::MakeNOP(0x453C16, 3, true);
+			// Y
+			injector::MakeNOP(0x453C1F, 3, true);
+			injector::MakeNOP(0x453C98, 3, true);
 		}
 	//	injector::WriteMemory<int>(0x0065ECF8, (int)&sub_463090_hook, true);
 	//	//injector::WriteMemory<int>(0x463140, (int)&FE_horscale, true);

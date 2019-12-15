@@ -1791,7 +1791,13 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
 		}
-
+		if (strcmp(CurrentFEElement, "<TEXT>.GText") == 0)
+		{
+			if ((*unk1).botX == 464 && (*unk1).botY == 63 && (*unk1).topY == 253)
+			{
+				(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+			}
+		}
 		// starting/ending grid end
 
 		// race end stuff start

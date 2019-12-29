@@ -11,12 +11,14 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 class CIniReader
 {
 public:
+	char m_szFileName[MAX_PATH];
 	CIniReader(char* szFileName)
 	{
 		char			moduleName[MAX_PATH];
 		char			dllPath[MAX_PATH];
 		char			iniName[MAX_PATH];
 		char*			tempPointer;
+
 
 		GetModuleFileName((HINSTANCE)&__ImageBase, moduleName, MAX_PATH);
 		tempPointer = strrchr(moduleName, '.');
@@ -97,7 +99,5 @@ public:
 	{
 		return m_szFileName;
 	}
-private:
-  char m_szFileName[MAX_PATH];
 };
 #endif//INIREADER_H

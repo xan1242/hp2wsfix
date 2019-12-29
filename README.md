@@ -21,3 +21,13 @@ You should be able to download the files necessary in the Releases tab.
 # Credits
 - ThirteenAG - for the injector, inireader and the Ultimate ASI Loader.
 - EA Canada - the game code itself
+
+# Screenshots
+## Standard widescreen (1280x720)
+![Ingame](Screenshots/W_Ingame.png)
+![Main menu](Screenshots/W_Menu_Main.png)
+![Car select](Screenshots/W_Menu_CarSelect.png)
+## Ultrawide (2560x1080)
+![Ingame](Screenshots/UW_Ingame.png)
+![Main menu](Screenshots/UW_Menu_Main.png)
+![Car select](Screenshots/UW_Menu_CarSelect.png)

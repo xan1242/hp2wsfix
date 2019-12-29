@@ -16,6 +16,11 @@ A rudimentary widescreen fix for Need for Speed: Hot Pursuit 2 on PC
 - Check out HP2WSFix.ini for more adjustments
 - If any issues arise, install the VC++ 2015 - 2019 Redistibutable package: https://aka.ms/vs/16/release/vc_redist.x86.exe
 
+# Requirements (for the release binaries)
+- SSE2 capable CPU (Pentium 4 and newer)
+- Windows 7 or newer (Wine not tested)
+- Visual C++ Redistibutable 2015
+
 # Downloads
 You should be able to download the files necessary in the Releases tab.
 

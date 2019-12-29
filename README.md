@@ -14,6 +14,7 @@ A rudimentary widescreen fix for Need for Speed: Hot Pursuit 2 on PC
 - Extract the contents of the .zip file to the game's root directory.
 - Go to your save directory (My Documents\EA Games), open rendercaps.ini and adjust your resolution under the [Graphics] key ([GraphicsFE] is unused)
 - Check out HP2WSFix.ini for more adjustments
+- If any issues arise, install the VC++ 2015 - 2019 Redistibutable package: https://aka.ms/vs/16/release/vc_redist.x86.exe
 
 # Downloads
 You should be able to download the files necessary in the Releases tab.

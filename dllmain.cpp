@@ -8,11 +8,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <direct.h>
+#include <Windows.h>
+#include <Shlobj.h>
 #include "includes\injector\injector.hpp"
 #include "includes\IniReader.h"
-
-#define TEST_XSCALE 1.6
-#define TEST_YSCALE 1.2
 
 #define FE_XPOS_ADDRESS 0x0084BC48
 #define FE_YPOS_ADDRESS 0x0084BC4C
@@ -23,11 +22,12 @@
 #define FE_FUNCTIONS_XSCALE_ADDRESS 0x006C2DB0
 #define FE_FUNCTIONS_YSCALE_ADDRESS 0x006C2DB4
 
+#define LANGUAGE_ADDRESS 0x84313C
+#define LIMITRES_ADDRESS 0x0083EFAC
+
 #define FOUR_BY_THREE_ASPECT 1.3333333333333333333333333333333
 #define LETTERBOX_ASPECT 2.1052631578947368421052631578947
 #define INTRO_LETTERBOX_ASPECT 2.9411764705882352941176470588235
-
-#define FE_HOR_SCALE_DRAW_ADDR 0x0054FF7D
 
 void InjectRes();
 int InitRenderCaps();
@@ -42,30 +42,41 @@ volatile float aspect_diff = 0.75;
 volatile float xscale_800 = 1.33375;
 volatile float xscale_640 = FOUR_BY_THREE_ASPECT;
 
-char UserDir[255];
-char RenderCapsIni[255];
+char UserDir[MAX_PATH];
+char RenderCapsIni[MAX_PATH];
+char MkDirStr[MAX_PATH + 7];
 char* CurrentFEElement;
 char* CurrentFEShapePointer;
 char CurrentFEShape[255];
-char* CurrentFEChild;
-char* LastFEChild;
-//bool bRerouteSaveDir = false;
+//char* CurrentFEChild;
 bool bEnableConsole = false;
-int FixHUD = 1;
+bool bDisableLetterboxing = false;
+bool bClassicMapPosition = false;
+int FixHUD = 2;
 unsigned int RenderMemorySize = 0x732000;
+unsigned int GeneralMemorySize = 0x5FB9000;
+unsigned int AudioMemorySize = 0xA00000;
+unsigned int TrackMemorySize = 0x2B00000;
+unsigned int LevelMemorySize = 0x196000;
+unsigned int UIMemorySize = 0x400000;
+unsigned int CarsMemorySize = 0x700000;
+unsigned int CharacterMemorySize = 0x17D000;
+unsigned int ReplayMemorySize = 0x64000;
+unsigned int IniFileMemorySize = 0x10000;
 
 float FE_horscale = 1.0;
 float FE_horposition = 0.0;
-int OptionsMenuXsize = 0;
+int OptionsMenuXsize = 650;
 
 int(__thiscall*ReadIni_Float)(unsigned int dis, char *section, char *key, float* value) = (int(__thiscall*)(unsigned int, char*, char*, float*))0x00527650;
 int(__thiscall*ReadIni_Int)(unsigned int dis, char *section, char *key, int* value) = (int(__thiscall*)(unsigned int, char*, char*, int*))0x00527560;
-//char*(__stdcall*GetUserDir)() = (char*(__stdcall*)())0x0053A5F0;
 int(__thiscall*WriteRenderCaps)(unsigned int dis) = (int(__thiscall*)(unsigned int))0x005410D0;
 int(__thiscall*sub_59B840)(unsigned int dis, char *key, unsigned int unk1, unsigned int unk2) = (int(__thiscall*)(unsigned int, char*, unsigned int, unsigned int))0x59B840;
-int(__thiscall*sub_59B6E0)(unsigned int dis, char *key, unsigned int unk1, unsigned int unk2) = (int(__thiscall*)(unsigned int, char*, unsigned int, unsigned int))0x59B6E0;
+//int(__thiscall*sub_59B6E0)(unsigned int dis, char *key, unsigned int unk1, unsigned int unk2) = (int(__thiscall*)(unsigned int, char*, unsigned int, unsigned int))0x59B6E0;
 int(__thiscall*sub_5994D0)(unsigned int dis, unsigned int unk1) = (int(__thiscall*)(unsigned int, unsigned int))0x5994D0;
 int(__thiscall*sub_5997B0)(unsigned int dis) = (int(__thiscall*)(unsigned int))0x5997B0;
+//int(__stdcall*sub_593DB0)(char *filename, char *FE_element, unsigned int unk) = (int(__stdcall*)(char*, char*, unsigned int))0x593DB0;
+
 
 struct UnkClass1
 {
@@ -81,22 +92,6 @@ struct mBorders
 	int topX;
 	int botX;
 	int botY;
-};
-
-struct bVector4
-{
-	float x;
-	float y;
-	float z;
-	float w;
-};
-
-struct bMatrix4
-{
-	struct bVector4 v0;
-	struct bVector4 v1;
-	struct bVector4 v2;
-	struct bVector4 v3;
 };
 
 void GetDesktopRes(volatile int* desktop_resX, volatile int* desktop_resY)
@@ -190,6 +185,12 @@ UnkClass1* __cdecl FE_CursorPos(UnkClass1* out, UnkClass1* in)
 	return out;
 }
 
+//int __stdcall sub_593DB0_hook(char *filename, char *FE_element, unsigned int unk)
+//{
+//	printf("FE: %s [%s]\n", filename, FE_element);
+//	return sub_593DB0(filename, FE_element, unk);
+//}
+
 int __stdcall sub_59B840_hook(char *key, mBorders* unk1, unsigned int unk2)
 {
 	unsigned int thethis = 0;
@@ -205,15 +206,17 @@ int __stdcall sub_59B840_hook(char *key, mBorders* unk1, unsigned int unk2)
 	return retval1;
 }
 
-int __stdcall sub_59B6E0_hook(char *key, unsigned int unk1, unsigned int unk2) // hook for fixing specific UI elements' mBorders
-{
-	unsigned int thethis = 0;
-	_asm mov thethis, ecx
-	unsigned int retval1 = sub_59B6E0(thethis, key, unk1, unk2);
-	CurrentFEChild = *(char**)(unk1 + 4);
-
-	return retval1;
-}
+//int __stdcall sub_59B6E0_hook(char *key, unsigned int unk1, unsigned int unk2) // hook for fixing specific UI elements' mBorders
+//{
+//	unsigned int thethis = 0;
+//	_asm mov thethis, ecx
+//	unsigned int retval1 = sub_59B6E0(thethis, key, unk1, unk2);
+//	CurrentFEChild = *(char**)(unk1 + 4);
+//	//if (CurrentFEChild)
+//	//	printf("FE: CHILD: %s\n", CurrentFEChild);
+//
+//	return retval1;
+//}
 
 int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) // hook for fixing specific UI elements' mBorders
 {
@@ -306,14 +309,16 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		if (strcmp(CurrentFEElement, "score.HudText") == 0)
 		{
 			(*unk1).topX = 0;
-			(*unk1).topY = 64;
+			if (!bClassicMapPosition)
+				(*unk1).topY = 64;
 			//return retval;
 		}
 
 		if (strcmp(CurrentFEElement, "map.HudMap") == 0)
 		{
 			(*unk1).topX = 2;
-			(*unk1).topY = 473;
+			if (!bClassicMapPosition)
+				(*unk1).topY = 473;
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -324,7 +329,8 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 			if ((*unk1).topX == 0 && (*unk1).topY == 125 && (*unk1).botX == 142 && (*unk1).botY == 12)
 			{
 				(*unk1).topX = 0;
-				(*unk1).topY = -16;
+				if (!bClassicMapPosition)
+					(*unk1).topY = -16;
 				//return retval;
 			}
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
@@ -429,14 +435,12 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		}
 		if (strcmp(CurrentFEElement, "5500.GSimpleImage") == 0)
 		{
-			//(*unk1).topX = (resX_600height - (*unk1).botX) / -(32.958333333333333333333333333333);
 			(*unk1).topX = -24;
 			(*unk1).topY = 36;
 			//return retval;
 		}
 		if (strcmp(CurrentFEElement, "6000.GSimpleImage") == 0)
 		{
-			//(*unk1).topX = (resX_600height - (*unk1).botX) / -(46.529411764705882352941176470588);
 			(*unk1).topX = -17;
 			(*unk1).topY = 34;
 			//return retval;
@@ -705,14 +709,28 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		// letterbox scaling
 		if ((strcmp(CurrentFEElement, "boxT.GImageBox") == 0) || (strcmp(CurrentFEElement, "tttt.GImageBox") == 0 || (strcmp(CurrentFEElement, "T.GImageBox") == 0)))
 		{
-			(*unk1).botY = (600 - (resX_600height / LETTERBOX_ASPECT)) / 2;
+			if (bDisableLetterboxing)
+			{
+				(*unk1).botX = 0;
+				(*unk1).botY = 0;
+			}
+			else
+				(*unk1).botY = (600 - (resX_600height / LETTERBOX_ASPECT)) / 2;
 			//return retval;
 		}
 		
 		if ((strcmp(CurrentFEElement, "boxB.GImageBox") == 0) || (strcmp(CurrentFEElement, "bbbb.GImageBox") == 0 || (strcmp(CurrentFEElement, "B.GImageBox") == 0)))
 		{
-			(*unk1).botY = (600 - (resX_600height / LETTERBOX_ASPECT)) / 2;
-			(*unk1).topY += 110 - (*unk1).botY;
+			if (bDisableLetterboxing)
+			{
+				(*unk1).botX = 0;
+				(*unk1).botY = 0;
+			}
+			else
+			{
+				(*unk1).botY = (600 - (resX_600height / LETTERBOX_ASPECT)) / 2;
+				(*unk1).topY += 110 - (*unk1).botY;
+			}
 			//return retval;
 		}
 
@@ -1024,6 +1042,7 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 
 		if (strcmp(CurrentFEElement, "<VIEW>.HP2OptionsView") == 0)
 		{
+			//(*unk1).topX = 0;
 			(*unk1).botX *= xscale_800;
 			OptionsMenuXsize = (*unk1).botX;
 			//return retval;
@@ -1282,7 +1301,8 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			if ((*unk1).botX == 240 && (*unk1).botY == 2 && (*unk1).topY == -20)
 			{
-				(*unk1).botX *= xscale_800;
+				(*unk1).topX /= xscale_800;
+				//(*unk1).botX *= xscale_800;
 				//return retval;
 			}
 		}
@@ -1290,7 +1310,8 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			if ((*unk1).botX == 240 && (*unk1).botY == 2 && (*unk1).topY == -20)
 			{
-				(*unk1).botX *= xscale_800;
+				(*unk1).topX /= xscale_800;
+				//(*unk1).botX *= xscale_800;
 				//return retval;
 			}
 		}
@@ -1392,6 +1413,66 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		}
 		// ffb & deadzone end
 
+		if (strcmp(CurrentFEElement, "<CC>.GButton") == 0)
+		{
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			if ((*unk1).botX == 200 && (*unk1).botY == 17 && (*unk1).topY == 320)
+			{
+				(*unk1).topX = (OptionsMenuXsize / 2.1103896103896103896103896103896) - 100;
+				//(*unk1).topX = (800 - (*unk1).botX) / 2;
+				//return retval;
+			}
+		}
+
+		if (strcmp(CurrentFEElement, "<RTD>.GButton") == 0)
+		{
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			if ((*unk1).botX == 200 && (*unk1).botY == 17 && (*unk1).topY == 230)
+			{
+				(*unk1).topX = (OptionsMenuXsize / 2.1103896103896103896103896103896) - 100;
+				//(*unk1).topX = (800 - (*unk1).botX) / 2;
+				//return retval;
+			}
+		}
+
+		if (strcmp(CurrentFEElement, "<FFB>.GButton") == 0)
+		{
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			if ((*unk1).botX == 200 && (*unk1).botY == 17 && (*unk1).topY == 260)
+			{
+				(*unk1).topX = (OptionsMenuXsize / 2.1103896103896103896103896103896) - 100;
+				//(*unk1).topX = (800 - (*unk1).botX) / 2;
+				//return retval;
+			}
+		}
+
+		if (strcmp(CurrentFEElement, "<DEADZONE>.GButton") == 0)
+		{
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			if ((*unk1).botX == 200 && (*unk1).botY == 17 && (*unk1).topY == 290)
+			{
+				(*unk1).topX = (OptionsMenuXsize / 2.1103896103896103896103896103896) - 100;
+				//(*unk1).topX = (800 - (*unk1).botX) / 2;
+				//return retval;
+			}
+		}
+
+		if (strcmp(CurrentFEElement, "<CONTROLS>.GWidget") == 0)
+		{
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			if ((*unk1).botX == 512 && (*unk1).botY == 164 && (*unk1).topY == 52)
+			{
+				(*unk1).topX = (OptionsMenuXsize / 3.7790697674418604651162790697674) - 100;
+				//(*unk1).topX = (800 - (*unk1).botX) / 2;
+				//return retval;
+			}
+		}
+
 		// controller options end
 
 		// credits screen start
@@ -1418,7 +1499,7 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 			{
 				if ((*unk1).botX == 222 && (*unk1).botY == 16 && (*unk1).topY == 210)
 				{
-					(*unk1).topX = (resX_600height - (*unk1).botX) / 2 - 137;
+					(*unk1).topX = (OptionsMenuXsize / 2.2260273972602739726027397260274) - 100;
 					//return retval;
 				}
 			}
@@ -1426,7 +1507,7 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 			{
 				if ((*unk1).botX == 222 && (*unk1).botY == 16 && (*unk1).topY == 240)
 				{
-					(*unk1).topX = (resX_600height - (*unk1).botX) / 2 - 137;
+					(*unk1).topX = (OptionsMenuXsize / 2.2260273972602739726027397260274) - 100;
 					//return retval;
 				}
 			}
@@ -1434,7 +1515,7 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 			{
 				if ((*unk1).botX == 222 && (*unk1).botY == 16 && (*unk1).topY == 270)
 				{
-					(*unk1).topX = (resX_600height - (*unk1).botX) / 2 - 137;
+					(*unk1).topX = (OptionsMenuXsize / 2.2260273972602739726027397260274) - 100;
 					//return retval;
 				}
 			}
@@ -1442,38 +1523,127 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 			{
 				if ((*unk1).botX == 222 && (*unk1).botY == 16 && (*unk1).topY == 300)
 				{
-					(*unk1).topX = (resX_600height - (*unk1).botX) / 2 - 137;
-					//return retval;
+					(*unk1).topX = (OptionsMenuXsize / 2.2260273972602739726027397260274) - 100;
 				}
 				//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 				//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
 			}
 			if (strcmp(CurrentFEElement, "<DPL>.ToggleButton") == 0)
 			{
-				(*unk1).topX = (resX_600height - (*unk1).botX) / 2 - 15;
+				(*unk1).topX = (OptionsMenuXsize / 1.625) - 100;
 				//return retval;
 			}
 			if (strcmp(CurrentFEElement, "<DSTATS>.GListBox") == 0)
 			{
-				(*unk1).topX = (resX_600height - (*unk1).botX) / 2 - 137;
+				(*unk1).topX = (OptionsMenuXsize / 2.9017857142857142857142857142857) - 100;
 				//return retval;
 			}
 			if (strcmp(CurrentFEElement, "<CURRP>.GText") == 0)
 			{
-				(*unk1).topX = (OptionsMenuXsize - 143) / 2 - 143;
-				//return retval;
+				(*unk1).topX = (OptionsMenuXsize / 2.9017857142857142857142857142857) - 100;
 				//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 				//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
 			}
+			// the create profile dialog thingie start
+			if (strcmp(CurrentFEElement, "<EDIT>.HP2EditText") == 0)
+			{
+				if ((*unk1).botX == 162 && (*unk1).botY == 12 && (*unk1).topY == 61)
+				{
+					(*unk1).topX /= xscale_800;
+					//return retval;
+				}
+			}
+			if (strcmp(CurrentFEElement, "editback00.GImageBar") == 0)
+			{
+				if ((*unk1).botX == 180 && (*unk1).botY == 22 && (*unk1).topY == 55)
+				{
+					(*unk1).topX /= xscale_800;
+					//return retval;
+				}
+			}
+			if (strcmp(CurrentFEElement, "<B1>.GButton") == 0)
+			{
+				if ((*unk1).botX == 222 && (*unk1).botY == 14 && (*unk1).topY == 110)
+				{
+					(*unk1).topX /= xscale_800;
+					//return retval;
+				}
+			}
+			if (strcmp(CurrentFEElement, "<B3>.GButton") == 0)
+			{
+				if ((*unk1).botX == 222 && (*unk1).botY == 14 && (*unk1).topY == 140)
+				{
+					(*unk1).topX /= xscale_800;
+					//return retval;
+				}
+			}
+			// the create profile dialog thingie end
 		}
 		// driver profile end
+
+		// multiplayer stuff start
+
+		if (strcmp(CurrentFEElement, "!H0Left.GImageBox") == 0)
+		{
+			if ((*unk1).botY == 2 && (*unk1).topY == 29)
+			{
+				(*unk1).topX = (resX_600height - (*unk1).botX) / 2 - 130;
+				//return retval;
+			}
+		}
+
+		if (strcmp(CurrentFEElement, "!H0left.GImageBox") == 0)
+		{
+			if ((*unk1).botY == 2 && (*unk1).topY == 20)
+			{
+				//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+				//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+				(*unk1).botX += (*unk1).topX + 10;
+				//return retval;
+			}
+		}
+		if (strcmp(CurrentFEElement, "!H1left.GImageBox") == 0)
+		{
+			if ((*unk1).botY == 2 && (*unk1).topY == 121)
+			{
+				//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+				//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+				(*unk1).botX += (*unk1).topX + 10;
+				//(*unk1).topX /= xscale_800;
+				//return retval;
+			}
+		}
+		if (strcmp(CurrentFEElement, "ttlbarL0.GImageBox") == 0)
+		{
+			if ((*unk1).botX == 320 && (*unk1).botY == 26 && (*unk1).topY == 21)
+			{
+				//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+				//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+				(*unk1).topX = (resX_600height - (*unk1).botX) / 2 - 159;
+				//return retval;
+			}
+		}
+		if (strcmp(CurrentFEElement, "ttlbarL1.GImageBox") == 0)
+		{
+			if ((*unk1).botX == 320 && (*unk1).botY == 26 && (*unk1).topY == 122)
+			{
+				(*unk1).topX = (resX_600height - (*unk1).botX) / 2 - 159;
+				//(*unk1).topX += (*unk1).topX;
+				//return retval;
+			}
+		}
+
+		// multiplayer stuff end
 
 		// car select
 		if (strcmp(CurrentFEElement, "<CAR>.CarWidget") == 0)
 		{
-			(*unk1).topX = resX / 21.33334;
-			if ((resX / 1280.0) < 2.0) // not sure when it's negative exactly
-				(*unk1).topX = -(*unk1).topX;
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2 + 57;
+			//(*unk1).topX = resX / 21.33334;
+			//if ((resX / 1280.0) < 2.0) // not sure when it's negative exactly
+			//	(*unk1).topX = -(*unk1).topX;
 			//return retval;
 		}
 
@@ -1697,8 +1867,11 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		}
 		if (strcmp(CurrentFEElement, "GRID.GWidget") == 0)
 		{
-			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
-			//return retval;
+			if ((*unk1).botX == 422 && (*unk1).botY == 160 && (*unk1).topY == 247)
+			{
+				(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+				//return retval;
+			}
 		}
 		if (strcmp(CurrentFEElement, "<StartRace>.GButton") == 0)
 		{
@@ -1931,22 +2104,27 @@ int __stdcall ReadIni_Float_Hook(char *section, char *key, float* value)
 	return returnval;
 }
 
-char* GetUserDir_Hook()
+char* __stdcall GetUserDir_Hook()
 {
-	//if (!bRerouteSaveDir)
-	//	return GetUserDir();
 	return UserDir;
 }
 
 int InitRenderCaps()
 {
-	if (CheckForPathAbsolution(GetUserDir_Hook()))
-		sprintf(RenderCapsIni, "%srendercaps.ini", GetUserDir_Hook());
-	else
-		sprintf(RenderCapsIni, "..\\%srendercaps.ini", GetUserDir_Hook()); // due to inireader's path defaulting to the scripts folder
+	bool bPathWasAbsolute = false;
+	if (CheckForPathAbsolution(UserDir))
+	{
+		sprintf(RenderCapsIni, "%srendercaps.ini", UserDir);
+		bPathWasAbsolute = true;
+	}
+	else // relative to the game exe
+		sprintf(RenderCapsIni, "..\\%srendercaps.ini", UserDir); // due to inireader's path defaulting to the scripts folder
 
 	// read the resolution from rendercaps.ini file directly
 	CIniReader rendercaps(RenderCapsIni);
+	// workaround due to silly inireader stuff...
+	if (bPathWasAbsolute)
+		strcpy(rendercaps.m_szFileName, RenderCapsIni);
 	resX = rendercaps.ReadInteger("Graphics", "Width", 0);
 	resY = rendercaps.ReadInteger("Graphics", "Height", 0);
 
@@ -1995,26 +2173,61 @@ int InitRenderCaps()
 int InitConfig()
 {
 	CIniReader inireader("");
+	struct stat st = { 0 };
 	const char* InputDirString = inireader.ReadString("HP2WSFix", "SaveDir", "save");
 	bEnableConsole = inireader.ReadInteger("HP2WSFix", "EnableConsole", 0);
 	FixHUD = inireader.ReadInteger("HP2WSFix", "FixHUD", 1);
-	RenderMemorySize = inireader.ReadInteger("HP2WSFix", "RenderMemorySize", 0x732000);
+	if (FixHUD)
+	{
+		bDisableLetterboxing = inireader.ReadInteger("HP2WSFix", "DisableLetterboxing", 0);
+		bClassicMapPosition = inireader.ReadInteger("HP2WSFix", "ClassicMapPosition", 0);
+	}
+	RenderMemorySize = inireader.ReadInteger("MEMORY", "CLASS_RENDER", 0x732000);
+	GeneralMemorySize = inireader.ReadInteger("MEMORY", "GENERAL", 0x5FB9000);
+	AudioMemorySize = inireader.ReadInteger("MEMORY", "CLASS_AUDIO", 0xA00000);
+	TrackMemorySize = inireader.ReadInteger("MEMORY", "CLASS_TRACK", 0x2B00000);
+	LevelMemorySize = inireader.ReadInteger("MEMORY", "CLASS_LEVEL", 0x196000);
+	UIMemorySize = inireader.ReadInteger("MEMORY", "CLASS_UI", 0x400000);
+	CarsMemorySize = inireader.ReadInteger("MEMORY", "CLASS_CARS", 0x700000);
+	CharacterMemorySize = inireader.ReadInteger("MEMORY", "CLASS_CHARACTER", 0x17D000);
+	ReplayMemorySize = inireader.ReadInteger("MEMORY", "CLASS_REPLAY", 0x64000);
+	IniFileMemorySize = inireader.ReadInteger("MEMORY", "CLASS_INIFILE", 0x10000);
 
-	//if (InputDirString && (InputDirString[0] != '0')) // 09/2019 - BROKEN FEATURE - game nulls the pointer at 83C024 because reasons..
-	//{
+	if (InputDirString && (InputDirString[0] != '0'))
+	{
 		//bRerouteSaveDir = true;
-		//strncpy(UserDir, InputDirString, 255);
+		strncpy(UserDir, InputDirString, 255);
 
 	if (CheckForPathAbsolution(InputDirString))
 		sprintf(UserDir, "%s", InputDirString);
 	else
 		sprintf(UserDir, "..\\%s", InputDirString);
 	
-	_mkdir(UserDir);
+	if (stat(UserDir, &st) == -1)
+	{
+		// NOT crossplatform compatible - made exclusively due to simplicity's sake
+		sprintf(MkDirStr, "mkdir %s", UserDir);
+		system(MkDirStr);
+	}
 	sprintf(UserDir, "%s\\", InputDirString);
 	//strncpy(UserDir, InputDirString, 255);
-
-	//}
+	}
+	else
+	{
+		// this is what the game does anyways, and since hooking into this piece of code causes crashes, I've rewritten it here
+		SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, UserDir);
+		if (*(int*)LANGUAGE_ADDRESS == 1)
+			strcat(UserDir, "\\EA Games\\Need For Speed poursuite infernale 2");
+		else
+			strcat(UserDir, "\\EA Games\\Need For Speed Hot Pursuit 2");
+		if (stat(UserDir, &st) == -1)
+		{
+			// NOT crossplatform compatible - made exclusively due to simplicity's sake
+			sprintf(MkDirStr, "mkdir %s", UserDir);
+			system(MkDirStr);
+		}
+		strcat(UserDir, "\\");
+	}
 
 	InitRenderCaps();
 
@@ -2023,6 +2236,9 @@ int InitConfig()
 
 void InjectRes()
 {
+	*(int*)LIMITRES_ADDRESS = 0;
+	injector::MakeJMP(0x0046F3A5, 0x46F3F1, true);
+
 	injector::WriteMemory<float>(0x40C501, aspect, true);
 	injector::WriteMemory<float>(0x53EB84, aspect, true);
 	injector::WriteMemory<float>(0x53ED7C, aspect, true);
@@ -2150,6 +2366,36 @@ int InitInjector()
 
 	// an actual attempt at a hi-poly fix
 	injector::WriteMemory<int>(0x0053BA84, RenderMemorySize, true);
+	injector::WriteMemory<int>(0x0053BA7D, RenderMemorySize, true); // korean lang.
+	injector::WriteMemory<int>(0x0053B8DD, RenderMemorySize, true); // for printout only
+	// other memory adjusters
+	injector::WriteMemory<int>(0x0053BBC2, GeneralMemorySize, true);
+	injector::WriteMemory<int>(0x0053BBD1, GeneralMemorySize, true); // korean lang.
+
+	injector::WriteMemory<int>(0x0053B9EE, AudioMemorySize, true);
+	injector::WriteMemory<int>(0x0053B849, AudioMemorySize, true); // for printout only
+
+	injector::WriteMemory<int>(0x0053BA04, TrackMemorySize, true);
+	injector::WriteMemory<int>(0x0053B86E, TrackMemorySize, true); // for printout only
+
+	injector::WriteMemory<int>(0x0053BA1A, LevelMemorySize, true);
+	injector::WriteMemory<int>(0x0053B893, LevelMemorySize, true); // for printout only
+
+	injector::WriteMemory<int>(0x0053BA27, UIMemorySize, true);
+	injector::WriteMemory<int>(0x0053BA35, UIMemorySize, true); // korean lang.
+	injector::WriteMemory<int>(0x0053B993, UIMemorySize, true); // for printout only
+
+	injector::WriteMemory<int>(0x0053BA59, CarsMemorySize, true);
+	injector::WriteMemory<int>(0x0053B8B8, CarsMemorySize, true); // for printout only
+
+	injector::WriteMemory<int>(0x0053BA9D, CharacterMemorySize, true);
+	injector::WriteMemory<int>(0x0053B902, CharacterMemorySize, true); // for printout only
+
+	injector::WriteMemory<int>(0x0053BAB3, ReplayMemorySize, true);
+	injector::WriteMemory<int>(0x0053B927, ReplayMemorySize, true); // for printout only
+
+	injector::WriteMemory<int>(0x0053BADC, IniFileMemorySize, true);
+	injector::WriteMemory<int>(0x0053B96E, IniFileMemorySize, true); // for printout only
 
 	// GUI sub_595440
 	if (FixHUD)
@@ -2159,7 +2405,7 @@ int InitInjector()
 		if (FixHUD > 1)
 		{
 			injector::MakeCALL(0x0059410A, sub_59B840_hook_2, true);
-			injector::MakeCALL(0x00593FEE, sub_59B6E0_hook, true);
+			//injector::MakeCALL(0x00593FEE, sub_59B6E0_hook, true);
 			injector::MakeCALL(0x00596F6A, sub_59BAE0_hook, true);
 			injector::MakeCALL(0x005980D8, sub_59BAE0_hook, true);
 
@@ -2170,6 +2416,9 @@ int InitInjector()
 			// Y
 			injector::MakeNOP(0x453C1F, 3, true);
 			injector::MakeNOP(0x453C98, 3, true);
+
+			// FE file access sniffer // FE: blabla
+			//injector::MakeCALL(0x00593CF1, sub_593DB0_hook, true);
 		}
 	injector::MakeCALL(0x00462FDF, sub_5954A0, true);
 	injector::MakeCALL(0x00463501, sub_5954A0, true);
@@ -2194,7 +2443,8 @@ int InitInjector()
 		injector::MakeNOP(0x00595324, 6, true);
 
 	}
-	injector::MakeJMP(0x00538140, printf, true);
+	if (bEnableConsole)
+		injector::MakeJMP(0x00538140, printf, true);
 
 	return 0;
 }

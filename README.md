@@ -6,6 +6,7 @@ A rudimentary widescreen fix for Need for Speed: Hot Pursuit 2 on PC
 - Fixes ingame and FrontEnd resolution (permanently disables resolution limiting)
 - FrontEnd element position scaling (or centering to 4:3)
 - Configure and increase the memory allocations (e.g. for the render class (CLASS_RENDER) - this fixes higher poly models from crashing the game (e.g. car mods))
+- d3d8to9 automatically enabled with the Ultimate ASI Loader (release binaries only)
 - Reroute the save directory
 - Ingame resolution changes are currently buggy (have to enter a race then exit or restart the game)
 - Needs detail polish (multiplayer server browser, some menus not centered, etc.)

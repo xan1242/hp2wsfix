@@ -2206,7 +2206,7 @@ int InitConfig()
 	if (stat(UserDir, &st) == -1)
 	{
 		// NOT crossplatform compatible - made exclusively due to simplicity's sake
-		sprintf(MkDirStr, "mkdir %s", UserDir);
+		sprintf(MkDirStr, "mkdir \"%s\"", UserDir);
 		system(MkDirStr);
 	}
 	sprintf(UserDir, "%s\\", InputDirString);
@@ -2223,7 +2223,7 @@ int InitConfig()
 		if (stat(UserDir, &st) == -1)
 		{
 			// NOT crossplatform compatible - made exclusively due to simplicity's sake
-			sprintf(MkDirStr, "mkdir %s", UserDir);
+			sprintf(MkDirStr, "mkdir \"%s\"", UserDir);
 			system(MkDirStr);
 		}
 		strcat(UserDir, "\\");

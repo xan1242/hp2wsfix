@@ -52,6 +52,7 @@ char CurrentFEShape[255];
 bool bEnableConsole = false;
 bool bDisableLetterboxing = false;
 bool bClassicMapPosition = false;
+bool bAlternativeBackground = false;
 int FixHUD = 2;
 unsigned int RenderMemorySize = 0x732000;
 unsigned int GeneralMemorySize = 0x5FB9000;
@@ -135,6 +136,16 @@ int __stdcall sub_59BAE0_hook(int a2, int a3)
 	v3 = (*(int(__stdcall **)(int))(*(int*)thethis + 20))(a2);
 	CurrentFEShapePointer = *(char**)(v3 + 4);
 	strcpy(CurrentFEShape, CurrentFEShapePointer);
+
+	// alternative titlescreen graphics start
+	if (bAlternativeBackground)
+	{
+		if (strcmp(CurrentFEShapePointer, "[PC:S_INTRO.LYR.PCD] back") == 0)
+		{
+			strcpy(CurrentFEShapePointer, "[PC:S_FEAT.LYR.PCD] feat");
+		}
+	}
+	// alternative titlescreen graphics end
 
 	if (*(int*)(v3 + 12))
 	{
@@ -738,16 +749,41 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		// logo
 		if ((strcmp(CurrentFEElement, "LOGO.GStaticImage") == 0) || (strcmp(CurrentFEElement, "logo.GStaticImage") == 0))
 		{
-			(*unk1).botX = 0;
-			(*unk1).botY = 0;
+			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+			// alternative titlescreen graphics start
+			if (!bAlternativeBackground)
+			{
+				(*unk1).botX = 0;
+				(*unk1).botY = 0;
+			}
+			// alternative titlescreen graphics end
+
 			//return retval;
 		}
 		if (strcmp(CurrentFEShape, "[PC:S_INTRO.LYR.PCD] nfsl") == 0)
 		{
 			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
+			// alternative titlescreen graphics start
+			if (bAlternativeBackground)
+			{
+				(*unk1).botX = 0;
+				(*unk1).botY = 0;
+			}
+			// alternative titlescreen graphics end
 			//return retval;
 		}
-
+		// alternative titlescreen graphics start
+		if (bAlternativeBackground)
+		{
+			if (strcmp(CurrentFEElement, "title.GText") == 0)
+			{
+				if ((*unk1).botX == 225 && (*unk1).botY == 42 && (*unk1).topY == 116)
+				{
+					(*unk1).topY = 60;
+				}
+			}
+		}
+		// alternative titlescreen graphics end
 		if (strcmp(CurrentFEElement, "EATip.GText") == 0)
 		{
 			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
@@ -776,6 +812,7 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		//	//(*unk1).topX = pow(aspect, 2) * 90;
 		//	//(*unk1).topX = 435;
 		//}
+
 		// title screen end
 
 		// titlebar fix
@@ -2182,6 +2219,7 @@ int InitConfig()
 		bDisableLetterboxing = inireader.ReadInteger("HP2WSFix", "DisableLetterboxing", 0);
 		bClassicMapPosition = inireader.ReadInteger("HP2WSFix", "ClassicMapPosition", 0);
 	}
+	bAlternativeBackground = inireader.ReadInteger("HP2WSFix", "AlternativeBackground", 0);
 	RenderMemorySize = inireader.ReadInteger("MEMORY", "CLASS_RENDER", 0x732000);
 	GeneralMemorySize = inireader.ReadInteger("MEMORY", "GENERAL", 0x5FB9000);
 	AudioMemorySize = inireader.ReadInteger("MEMORY", "CLASS_AUDIO", 0xA00000);

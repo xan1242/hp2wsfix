@@ -8,13 +8,8 @@ HD font pack for Need for Speed: Hot Pursuit 2 on PC
 - Install HP2WSFix and adjust the memory (as described below)
 
 # Requirements
-- Memory adjustment - you need to install the HP2WSFix and adjust the memory size to match the following:
-```ini
-[MEMORY]
-CLASS_UI=0xA000000
-GENERAL=0x5FB90000
-```
-If you do not edit the memory size, the game will crash while loading a track.
+- Memory adjustment - you need to install the HP2WSFix which increases the memory budget of the game so these fonts work without bugs.
+If you do not install HP2WSFix, the game will crash while loading a track.
 
 # Fonts
 The fonts were generated using a 72 point height for the fonts (maximum allowed currently) with the GDI engine.

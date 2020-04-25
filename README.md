@@ -21,7 +21,7 @@ A rudimentary widescreen fix for Need for Speed: Hot Pursuit 2 on PC
 # Requirements (for the release binaries)
 - SSE2 capable CPU (Pentium 4 and newer)
 - 1GB RAM for HD fonts and textures
-- Windows 7 or newer (Wine not tested)
+- Windows 7 or newer (Wine & WinXP NOT working - ASI loader doesn't work)
 - Visual C++ Redistibutable 2015
 - Version 242 (or version 1.32.20-R) of the game: [PATCH DOWNLOAD LINK](http://www.mediafire.com/view/xwj5zej5ejdlptt)
 

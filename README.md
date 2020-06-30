@@ -30,7 +30,7 @@ You should be able to download the files necessary in the Releases tab.
 
 # WORKAROUND FOR WINE USERS:
 - Rename the ASI loader from d3d8.dll to dinput.dll (NOT DINPUT8)
-- In Wine configuration (winecfg) add a library override for dinput (it MUST be set to native first) [SCREENSHOT](https://imgur.com/X2jlRJG.png)
+- In Wine configuration (winecfg) add a library override for dinput (it MUST be set to native first) [SCREENSHOT](https://raw.githubusercontent.com/xan1242/hp2wsfix/master/Screenshots/WineCfg.png)
 
 Wine WILL throw exceptions for a pagefault at 0x5380e6, however, you can close Wine's exception handler and continue playing the game.
 This is due to the game having its own exception handler and Wine doesn't like that at all...

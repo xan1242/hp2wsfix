@@ -23,7 +23,7 @@ A rudimentary widescreen fix for Need for Speed: Hot Pursuit 2 on PC
 - 1GB RAM for HD fonts and textures
 - Windows XP or newer (Wine not working, WinXP doesn't have the console window possibility)
 - Visual C++ Redistibutable 2015
-- Version 242 (or version 1.32.20-R) of the game: [PATCH DOWNLOAD LINK](http://www.mediafire.com/view/xwj5zej5ejdlptt)
+- Version 242 (or version 1.32.20-R) of the game: [PATCH DOWNLOAD LINK](http://www.mediafire.com/view/xwj5zej5ejdlptt) & NoCD a patch for it
 
 # Downloads
 You should be able to download the files necessary in the Releases tab.

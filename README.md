@@ -21,12 +21,19 @@ A rudimentary widescreen fix for Need for Speed: Hot Pursuit 2 on PC
 # Requirements (for the release binaries)
 - SSE2 capable CPU (Pentium 4 and newer)
 - 1GB RAM for HD fonts and textures
-- Windows XP or newer (Wine not working, WinXP doesn't have the console window possibility)
+- Windows XP or newer (Wine REQUIRES workaround, see below, WinXP doesn't have the console window possibility)
 - Visual C++ Redistibutable 2015
 - Version 242 (or version 1.32.20-R) of the game: [PATCH DOWNLOAD LINK](http://www.mediafire.com/view/xwj5zej5ejdlptt) & NoCD a patch for it
 
 # Downloads
 You should be able to download the files necessary in the Releases tab.
+
+# WORKAROUND FOR WINE USERS:
+- Rename the ASI loader from d3d8.dll to dinput.dll (NOT DINPUT8)
+- In Wine configuration (winecfg) add a library override for dinput (it MUST be set to native first) [SCREENSHOT](https://imgur.com/X2jlRJG.png)
+
+Wine WILL throw exceptions for a pagefault at 0x5380e6, however, you can close Wine's exception handler and continue playing the game.
+This is due to the game having its own exception handler and Wine doesn't like that at all...
 
 # Credits
 - ThirteenAG - for the injector, inireader and the Ultimate ASI Loader.

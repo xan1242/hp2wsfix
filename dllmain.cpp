@@ -13,17 +13,11 @@
 #include "includes\injector\injector.hpp"
 #include "includes\IniReader.h"
 
-#define FE_XPOS_ADDRESS 0x0084BC48
-#define FE_YPOS_ADDRESS 0x0084BC4C
-
-#define FE_XSCALE_ADDRESS 0x006C2DA8
-#define FE_YSCALE_ADDRESS 0x006C2DAC
-
-#define FE_FUNCTIONS_XSCALE_ADDRESS 0x006C2DB0
-#define FE_FUNCTIONS_YSCALE_ADDRESS 0x006C2DB4
-
-#define LANGUAGE_ADDRESS 0x84313C
-#define LIMITRES_ADDRESS 0x0083EFAC
+#ifdef HP2DEBUG
+#include "HP2_DBG_Addresses.h"
+#else
+#include "HP2_242_Addresses.h"
+#endif
 
 #define FOUR_BY_THREE_ASPECT 1.3333333333333333333333333333333
 #define LETTERBOX_ASPECT 2.1052631578947368421052631578947
@@ -54,6 +48,7 @@ bool bDisableLetterboxing = false;
 bool bClassicMapPosition = false;
 bool bAlternativeBackground = false;
 int FixHUD = 2;
+unsigned int ReflectionResolution = 128;
 unsigned int RenderMemorySize = 0x732000;
 unsigned int GeneralMemorySize = 0x5FB9000;
 unsigned int AudioMemorySize = 0xA00000;
@@ -68,6 +63,35 @@ unsigned int IniFileMemorySize = 0x10000;
 float FE_horscale = 1.0;
 float FE_horposition = 0.0;
 int OptionsMenuXsize = 650;
+
+
+// coord offsets for HUD elements
+int Tach_XOffset = 0;
+int Tach_YOffset = 0;
+
+int Map_XOffset = 0;
+int Map_YOffset = 0;
+
+int Time_XOffset = 0;
+int Time_YOffset = 0;
+
+int RVM_XOffset = 0;
+int RVM_YOffset = 0;
+
+int POS_XOffset = 0;
+int POS_YOffset = 0;
+
+int Cuffo_XOffset = 0;
+int Cuffo_YOffset = 0;
+
+int CopAmmo_XOffset = 0;
+int CopAmmo_YOffset = 0;
+
+int Score_XOffset = 0;
+int Score_YOffset = 0;
+
+int Dash_XOffset = 0;
+int Dash_YOffset = 0;
 
 int(__thiscall*ReadIni_Float)(unsigned int dis, char *section, char *key, float* value) = (int(__thiscall*)(unsigned int, char*, char*, float*))0x00527650;
 int(__thiscall*ReadIni_Int)(unsigned int dis, char *section, char *key, int* value) = (int(__thiscall*)(unsigned int, char*, char*, int*))0x00527560;
@@ -267,18 +291,26 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = resX_600height - 82;
 			(*unk1).topY = 2;
+
+			(*unk1).topX -= Time_XOffset;
+			(*unk1).topY += Time_YOffset;
+
 			//return retval;
 		}
 		if (strcmp(CurrentFEElement, "s2.HudText") == 0)
 		{
 			(*unk1).topX = resX_600height - 82;
 			(*unk1).topY = 19;
+			(*unk1).topX -= Time_XOffset;
+			(*unk1).topY += Time_YOffset;
 			//return retval;
 		}
 		if (strcmp(CurrentFEElement, "s3.HudText") == 0)
 		{
 			(*unk1).topX = resX_600height - 82;
 			(*unk1).topY = 36;
+			(*unk1).topX -= Time_XOffset;
+			(*unk1).topY += Time_YOffset;
 			//return retval;
 		}
 
@@ -286,6 +318,8 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = resX_600height - (*unk1).botX - 98;
 			(*unk1).topY = 2;
+			(*unk1).topX -= Time_XOffset;
+			(*unk1).topY += Time_YOffset;
 			//return retval;
 		}
 
@@ -293,6 +327,8 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = resX_600height - (*unk1).botX - 96;
 			(*unk1).topY = 19;
+			(*unk1).topX -= Time_XOffset;
+			(*unk1).topY += Time_YOffset;
 			//return retval;
 		}
 
@@ -300,6 +336,8 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = resX_600height - (*unk1).botX - 97;
 			(*unk1).topY = 36;
+			(*unk1).topX -= Time_XOffset;
+			(*unk1).topY += Time_YOffset;
 			//return retval;
 		}
 
@@ -307,6 +345,14 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = 16;
 			(*unk1).topY = 0;
+
+			(*unk1).topX += POS_XOffset;
+			(*unk1).topX += POS_YOffset;
+			
+			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
+			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
+
+
 			//return retval;
 		}
 
@@ -314,6 +360,10 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = 64;
 			(*unk1).topY = 14;
+
+			(*unk1).topX += POS_XOffset;
+			(*unk1).topX += POS_YOffset;
+
 			//return retval;
 		}
 
@@ -321,15 +371,23 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = 0;
 			if (!bClassicMapPosition)
+			{
 				(*unk1).topY = 64;
+			}
+			(*unk1).topX += Score_XOffset;
+			(*unk1).topY += Score_YOffset;
+
 			//return retval;
 		}
 
 		if (strcmp(CurrentFEElement, "map.HudMap") == 0)
 		{
-			(*unk1).topX = 2;
+			(*unk1).topX = 2 + Map_XOffset;
 			if (!bClassicMapPosition)
 				(*unk1).topY = 473;
+
+			(*unk1).topY -= Map_YOffset;
+
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -341,7 +399,10 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 			{
 				(*unk1).topX = 0;
 				if (!bClassicMapPosition)
+				{
 					(*unk1).topY = -16;
+
+				}
 				//return retval;
 			}
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
@@ -352,6 +413,10 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = 2;
 			(*unk1).topY = 2;
+
+			(*unk1).topX += CopAmmo_XOffset;
+			(*unk1).topY += CopAmmo_YOffset;
+
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -361,6 +426,10 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = 2;
 			(*unk1).topY = 21;
+
+			(*unk1).topX += CopAmmo_XOffset;
+			(*unk1).topY += CopAmmo_YOffset;
+
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -370,6 +439,10 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = 2;
 			(*unk1).topY = 40;
+
+			(*unk1).topX += CopAmmo_XOffset;
+			(*unk1).topY += CopAmmo_YOffset;
+
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -379,6 +452,9 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = 2;
 			(*unk1).topY = 40;
+
+			(*unk1).topX += CopAmmo_XOffset;
+			(*unk1).topY += CopAmmo_YOffset;
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -388,6 +464,9 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = 2;
 			(*unk1).topY = 21;
+
+			(*unk1).topX += CopAmmo_XOffset;
+			(*unk1).topY += CopAmmo_YOffset;
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -397,6 +476,9 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = 2;
 			(*unk1).topY = 2;
+
+			(*unk1).topX += CopAmmo_XOffset;
+			(*unk1).topY += CopAmmo_YOffset;
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -408,6 +490,11 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
 			(*unk1).topY = 4;
+
+			(*unk1).topX -= RVM_XOffset;
+			(*unk1).topY += RVM_YOffset;
+
+
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -418,12 +505,16 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 			{
 				(*unk1).topX = -8;
 				(*unk1).topY = -3;
+				//(*unk1).topX -= RVM_XOffset;
+				//(*unk1).topY -= RVM_YOffset;
 				//return retval;
 			}
 			if (strcmp(CurrentFEElement, "i0a.GStaticImage") == 0)
 			{
 				(*unk1).topX = 199;
 				(*unk1).topY = -3;
+				//(*unk1).topX -= RVM_XOffset;
+				//(*unk1).topY -= RVM_YOffset;
 				//return retval;
 			}
 		}
@@ -432,8 +523,9 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		// tach start
 		if (strcmp(CurrentFEElement, "digitach.HudTachometer") == 0)
 		{
-			(*unk1).topX = resX_600height - 60;
-			(*unk1).topY += 20; // this will need fixing if we're gonna do 1:1 scaling...
+			(*unk1).topX = resX_600height - 60 - Tach_XOffset;
+			(*unk1).topY += 20 - Tach_YOffset; // this will need fixing if we're gonna do 1:1 scaling...
+
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -527,6 +619,12 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
 			(*unk1).topY -= 6;
+
+			(*unk1).topX += Dash_XOffset;
+			(*unk1).topY -= Dash_YOffset;
+			if (Dash_YOffset < Cuffo_YOffset)
+				(*unk1).topY -= Cuffo_YOffset;
+
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -635,6 +733,10 @@ int __stdcall sub_59B840_hook_2(char *key, mBorders* unk1, unsigned int unk2) //
 		{
 			(*unk1).topX = (resX_600height - (*unk1).botX) / 2;
 			(*unk1).topY = (600 - (*unk1).botY) - 2;
+
+			(*unk1).topX += Cuffo_XOffset;
+			(*unk1).topY -= Cuffo_YOffset;
+
 			//return retval;
 			//printf("GUI.mBorders pointers: [ %X , %X ] %X , %X\n", &(*unk1).topX, &(*unk1).topY, &(*unk1).botX, &(*unk1).botY);
 			//printf("GUI.mBorders: [ %d , %d ] %d , %d\n", (*unk1).topX, (*unk1).topY, (*unk1).botX, (*unk1).botY);
@@ -2220,6 +2322,37 @@ int InitConfig()
 		bClassicMapPosition = inireader.ReadInteger("HP2WSFix", "ClassicMapPosition", 0);
 	}
 	bAlternativeBackground = inireader.ReadInteger("HP2WSFix", "AlternativeBackground", 0);
+	ReflectionResolution = inireader.ReadInteger("HP2WSFix", "ReflectionResolution", 128);
+
+
+	Tach_XOffset = inireader.ReadInteger("HUDOffset", "Tach_X", 0);
+	Tach_YOffset = inireader.ReadInteger("HUDOffset", "Tach_Y", 0);
+
+	Map_XOffset = inireader.ReadInteger("HUDOffset", "Map_X", 0);
+	Map_YOffset = inireader.ReadInteger("HUDOffset", "Map_Y", 0);
+
+	Time_XOffset = inireader.ReadInteger("HUDOffset", "Time_X", 0);
+	Time_YOffset = inireader.ReadInteger("HUDOffset", "Time_Y", 0);
+
+	RVM_XOffset = inireader.ReadInteger("HUDOffset", "RVM_X", 0);
+	RVM_YOffset = inireader.ReadInteger("HUDOffset", "RVM_Y", 0);
+
+	POS_XOffset = inireader.ReadInteger("HUDOffset", "POS_X", 0);
+	POS_YOffset = inireader.ReadInteger("HUDOffset", "POS_Y", 0);
+
+	Cuffo_XOffset = inireader.ReadInteger("HUDOffset", "Cuffo_X", 0);
+	Cuffo_YOffset = inireader.ReadInteger("HUDOffset", "Cuffo_Y", 0);
+
+	CopAmmo_XOffset = inireader.ReadInteger("HUDOffset", "CopAmmo_X", 0);
+	CopAmmo_YOffset = inireader.ReadInteger("HUDOffset", "CopAmmo_Y", 0);
+
+	Score_XOffset = inireader.ReadInteger("HUDOffset", "Score_X", 0);
+	Score_YOffset = inireader.ReadInteger("HUDOffset", "Score_Y", 0);
+
+	Dash_XOffset = inireader.ReadInteger("HUDOffset", "Dash_X", 0);
+	Dash_YOffset = inireader.ReadInteger("HUDOffset", "Dash_Y", 0);
+
+
 	RenderMemorySize = inireader.ReadInteger("MEMORY", "CLASS_RENDER", 0x732000);
 	GeneralMemorySize = inireader.ReadInteger("MEMORY", "GENERAL", 0x5FB9000);
 	AudioMemorySize = inireader.ReadInteger("MEMORY", "CLASS_AUDIO", 0xA00000);
@@ -2275,61 +2408,66 @@ int InitConfig()
 void InjectRes()
 {
 	*(int*)LIMITRES_ADDRESS = 0;
-	injector::MakeJMP(0x0046F3A5, 0x46F3F1, true);
+	injector::MakeJMP(LIMITRES_ADDRESS_JMP1, LIMITRES_ADDRESS_JMP2, true);
 
-	injector::WriteMemory<float>(0x40C501, aspect, true);
-	injector::WriteMemory<float>(0x53EB84, aspect, true);
-	injector::WriteMemory<float>(0x53ED7C, aspect, true);
+	injector::WriteMemory<float>(ASPECT_ADDRESS_1, aspect, true);
+	injector::WriteMemory<float>(ASPECT_ADDRESS_2, aspect, true);
+	injector::WriteMemory<float>(ASPECT_ADDRESS_3, aspect, true);
 	// gui
-	injector::WriteMemory<float>(0x0065D900, aspect, true);
+	injector::WriteMemory<float>(ASPECT_ADDRESS_4, aspect, true);
+
+#ifdef HP2DEBUG // extra values
+	injector::WriteMemory<float>(ASPECT_ADDRESS_5, aspect, true);
+	injector::WriteMemory<float>(ASPECT_ADDRESS_6, aspect, true);
+#endif
 
 	// mov
-	injector::WriteMemory<int>(0x541610, resX, true);
-	injector::WriteMemory<int>(0x541617, resY, true);
+	injector::WriteMemory<int>(RESX_ADDRESS_01, resX, true);
+	injector::WriteMemory<int>(RESY_ADDRESS_01, resY, true);
 
 	// push
-	injector::WriteMemory<int>(0x00541489, resX, true);
-	injector::WriteMemory<int>(0x00541484, resY, true);
+	injector::WriteMemory<int>(RESX_ADDRESS_02, resX, true);
+	injector::WriteMemory<int>(RESY_ADDRESS_02, resY, true);
 
 	// push
-	injector::WriteMemory<int>(0x005414A5, resX, true);
-	injector::WriteMemory<int>(0x005414A0, resY, true);
+	injector::WriteMemory<int>(RESX_ADDRESS_03, resX, true);
+	injector::WriteMemory<int>(RESY_ADDRESS_03, resY, true);
 
 	// push
-	injector::WriteMemory<int>(0x005415F4, resX, true);
-	injector::WriteMemory<int>(0x005415EF, resY, true);
+	injector::WriteMemory<int>(RESX_ADDRESS_04, resX, true);
+	injector::WriteMemory<int>(RESY_ADDRESS_04, resY, true);
 
 	// cmp
-	injector::WriteMemory<int>(0x004D6A39, resX, true);
-	injector::WriteMemory<int>(0x004D6A42, resY, true);
+	injector::WriteMemory<int>(RESX_ADDRESS_05, resX, true);
+	injector::WriteMemory<int>(RESY_ADDRESS_05, resY, true);
 
 	// mov
-	injector::WriteMemory<int>(0x005414DD, resX, true);
-	injector::WriteMemory<int>(0x005414E4, resY, true);
+	injector::WriteMemory<int>(RESX_ADDRESS_06, resX, true);
+	injector::WriteMemory<int>(RESY_ADDRESS_06, resY, true);
 
 	// cmp
-	injector::WriteMemory<int>(0x00541899, resX, true);
-	injector::WriteMemory<int>(0x005418A1, resY, true);
+	injector::WriteMemory<int>(RESX_ADDRESS_07, resX, true);
+	injector::WriteMemory<int>(RESY_ADDRESS_07, resY, true);
 
-	injector::WriteMemory<float>(0x0069D004, (float)resX, true);
-	injector::WriteMemory<float>(0x0069D008, (float)resY, true);
+	injector::WriteMemory<float>(RESX_ADDRESS_08, (float)resX, true);
+	injector::WriteMemory<float>(RESY_ADDRESS_08, (float)resY, true);
 
-	injector::WriteMemory<float>(0x0069D014, (float)resX, true);
-	injector::WriteMemory<float>(0x0069D018, (float)resY, true);
+	injector::WriteMemory<float>(RESX_ADDRESS_09, (float)resX, true);
+	injector::WriteMemory<float>(RESY_ADDRESS_09, (float)resY, true);
 
-	injector::WriteMemory<float>(0x6639F0, (float)resX, true);
-	injector::WriteMemory<float>(0x6639F4, (float)resY, true);
+	injector::WriteMemory<float>(RESX_ADDRESS_10, (float)resX, true);
+	injector::WriteMemory<float>(RESY_ADDRESS_10, (float)resY, true);
 
 	// METHOD 2 - FIX Y FE SCALING BY CHANGING SCALING FACTOR
-	injector::WriteMemory<float>(0x00445BE3, aspect_diff, true); // FE 3D map actor Y scale
-	injector::WriteMemory<float>(0x0044D59D, aspect_diff, true); // FE car actor Y scale
-	injector::WriteMemory<float>(0x0049C3F3, aspect_diff, true); // FE 3D event tree actor Y scale
+	injector::WriteMemory<float>(FE_3DYSCALE_ADDRESS_1, aspect_diff, true); // FE 3D map actor Y scale
+	injector::WriteMemory<float>(FE_3DYSCALE_ADDRESS_2, aspect_diff, true); // FE car actor Y scale
+	injector::WriteMemory<float>(FE_3DYSCALE_ADDRESS_3, aspect_diff, true); // FE 3D event tree actor Y scale
 
 	// GUI hax
 	if (FixHUD)
 	{
-		injector::WriteMemory<float>(0x45A8EC, (float)resX, true);
-		injector::WriteMemory<float>(0x45A8F3, (float)resY, true);
+		injector::WriteMemory<float>(RESX_ADDRESS_11, (float)resX, true);
+		injector::WriteMemory<float>(RESY_ADDRESS_11, (float)resY, true);
 	}
 }
 
@@ -2338,151 +2476,162 @@ int InitInjector()
 	InjectRes();
 
 	// dirty FOV ini read hooks (WILL GET REPLACED BY PROPER SCALING HACKS LATER)
-	injector::MakeCALL(0x0040EC2F, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x0040ED5C, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x0040EE83, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x0040F624, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x0040F751, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x0040F878, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x0040FF33, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x0040FFFC, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x004100C5, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x004105E4, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x00410626, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x00410668, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x00411092, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x004110EA, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x00411142, ReadIni_Float_Hook, true);
-	injector::MakeCALL(0x00410D9B, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_01, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_02, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_03, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_04, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_05, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_06, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_07, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_08, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_09, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_10, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_11, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_12, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_13, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_14, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_15, ReadIni_Float_Hook, true);
+	injector::MakeCALL(READINI_FLOAT_ADDRESS_16, ReadIni_Float_Hook, true);
 
 	// User directory hax
-	injector::MakeCALL(0x00437F4D, GetUserDir_Hook, true);
-	injector::MakeCALL(0x00438027, GetUserDir_Hook, true);
-	injector::MakeCALL(0x446896, GetUserDir_Hook, true);
-	injector::MakeCALL(0x446F50 + 0x38F, GetUserDir_Hook, true);
-	injector::MakeCALL(0x446F50 + 0x3C6, GetUserDir_Hook, true);
-	injector::MakeCALL(0x447F90, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4487CE, GetUserDir_Hook, true);
-	injector::MakeCALL(0x448B80 + 0x2A, GetUserDir_Hook, true);
-	injector::MakeCALL(0x44FC50 + 0x98, GetUserDir_Hook, true);
-	injector::MakeCALL(0x456120 + 0x691, GetUserDir_Hook, true);
-	injector::MakeCALL(0x457075, GetUserDir_Hook, true);
-	injector::MakeCALL(0x457290 + 0x2DF, GetUserDir_Hook, true);
-	injector::MakeCALL(0x457BB0 + 0x37F, GetUserDir_Hook, true);
-	injector::MakeCALL(0x00458662, GetUserDir_Hook, true);
-	injector::MakeCALL(0x458720 + 0x20, GetUserDir_Hook, true);
-	injector::MakeCALL(0x458800 + 0x2E, GetUserDir_Hook, true);
-	injector::MakeCALL(0x458A60 + 0x17, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4CF7A0 + 0x11, GetUserDir_Hook, true);
-	injector::MakeCALL(0x004CFBF3, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4CFC10 + 0x9, GetUserDir_Hook, true);
-	injector::MakeCALL(0x004CFC79, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4D6A4E, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4D9F60 + 0x2F, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4DA000 + 0x35, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4DA300 + 0x2F, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4DA3A0 + 0x35, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4DA4C0 + 0x2E, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4EFDA0 + 0x44, GetUserDir_Hook, true);
-	injector::MakeCALL(0x4F0320 + 0x43, GetUserDir_Hook, true);
-	injector::MakeCALL(0x507450 + 0x47, GetUserDir_Hook, true);
-	injector::MakeCALL(0x507AB0 + 0x46, GetUserDir_Hook, true);
-	injector::MakeCALL(0x5133BA, GetUserDir_Hook, true);
-	injector::MakeCALL(0x513220 + 0x1FF, GetUserDir_Hook, true);
-	injector::MakeCALL(0x00514341, GetUserDir_Hook, true);
-	injector::MakeCALL(0x540EB0 + 0x1E, GetUserDir_Hook, true);
-	injector::MakeCALL(0x5410D0 + 0x1E, GetUserDir_Hook, true);
-	injector::MakeCALL(0x549D30 + 0x4A, GetUserDir_Hook, true);
-	injector::MakeCALL(0x549F20 + 0x35, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_01, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_02, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_03, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_04, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_05, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_06, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_07, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_08, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_09, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_10, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_11, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_12, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_13, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_14, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_15, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_16, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_17, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_18, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_19, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_20, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_21, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_22, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_23, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_24, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_25, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_26, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_27, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_28, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_29, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_30, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_31, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_32, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_33, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_34, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_35, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_36, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_37, GetUserDir_Hook, true);
+	injector::MakeCALL(GETUSERDIR_HOOK_ADDR_38, GetUserDir_Hook, true);
 
 	// WriteRenderCaps
-	injector::MakeCALL(0x0046F0EC, WriteRenderCaps_Hook, true);
-	injector::MakeCALL(0x0046FE53, WriteRenderCaps_Hook, true);
-	injector::MakeCALL(0x004D656E, WriteRenderCaps_Hook, true);
+	injector::MakeCALL(WRITERENDERCAPS_ADDRESS_1, WriteRenderCaps_Hook, true);
+	injector::MakeCALL(WRITERENDERCAPS_ADDRESS_2, WriteRenderCaps_Hook, true);
+	injector::MakeCALL(WRITERENDERCAPS_ADDRESS_3, WriteRenderCaps_Hook, true);
 
 	// "Hi-Poly" fixes
 
 	// an actual attempt at a hi-poly fix
-	injector::WriteMemory<int>(0x0053BA84, RenderMemorySize, true);
-	injector::WriteMemory<int>(0x0053BA7D, RenderMemorySize, true); // korean lang.
-	injector::WriteMemory<int>(0x0053B8DD, RenderMemorySize, true); // for printout only
+	injector::WriteMemory<int>(RENDERMEMORYSIZE_ADDR_1, RenderMemorySize, true);
+	injector::WriteMemory<int>(RENDERMEMORYSIZE_ADDR_2, RenderMemorySize, true); // korean lang.
+	injector::WriteMemory<int>(RENDERMEMORYSIZE_ADDR_3, RenderMemorySize, true); // for printout only
 	// other memory adjusters
-	injector::WriteMemory<int>(0x0053BBC2, GeneralMemorySize, true);
-	injector::WriteMemory<int>(0x0053BBD1, GeneralMemorySize, true); // korean lang.
+	injector::WriteMemory<int>(GENERALMEMORYSIZE_ADDR_1, GeneralMemorySize, true);
+	injector::WriteMemory<int>(GENERALMEMORYSIZE_ADDR_2, GeneralMemorySize, true); // korean lang.
 
-	injector::WriteMemory<int>(0x0053B9EE, AudioMemorySize, true);
-	injector::WriteMemory<int>(0x0053B849, AudioMemorySize, true); // for printout only
+	injector::WriteMemory<int>(AUDIOMEMORYSIZE_ADDR_1, AudioMemorySize, true);
+	injector::WriteMemory<int>(AUDIOMEMORYSIZE_ADDR_2, AudioMemorySize, true); // for printout only
 
-	injector::WriteMemory<int>(0x0053BA04, TrackMemorySize, true);
-	injector::WriteMemory<int>(0x0053B86E, TrackMemorySize, true); // for printout only
+	injector::WriteMemory<int>(TRACKMEMORYSIZE_ADDR_1, TrackMemorySize, true);
+	injector::WriteMemory<int>(TRACKMEMORYSIZE_ADDR_2, TrackMemorySize, true); // for printout only
 
-	injector::WriteMemory<int>(0x0053BA1A, LevelMemorySize, true);
-	injector::WriteMemory<int>(0x0053B893, LevelMemorySize, true); // for printout only
+	injector::WriteMemory<int>(LEVELMEMORYSIZE_ADDR_1, LevelMemorySize, true);
+	injector::WriteMemory<int>(LEVELMEMORYSIZE_ADDR_2, LevelMemorySize, true); // for printout only
 
-	injector::WriteMemory<int>(0x0053BA27, UIMemorySize, true);
-	injector::WriteMemory<int>(0x0053BA35, UIMemorySize, true); // korean lang.
-	injector::WriteMemory<int>(0x0053B993, UIMemorySize, true); // for printout only
+	injector::WriteMemory<int>(UIMEMORYSIZE_ADDR_1, UIMemorySize, true);
+	injector::WriteMemory<int>(UIMEMORYSIZE_ADDR_2, UIMemorySize, true); // korean lang.
+	injector::WriteMemory<int>(UIMEMORYSIZE_ADDR_3, UIMemorySize, true); // for printout only
 
-	injector::WriteMemory<int>(0x0053BA59, CarsMemorySize, true);
-	injector::WriteMemory<int>(0x0053B8B8, CarsMemorySize, true); // for printout only
+	injector::WriteMemory<int>(CARSMEMORYSIZE_ADDR_1, CarsMemorySize, true);
+	injector::WriteMemory<int>(CARSMEMORYSIZE_ADDR_2, CarsMemorySize, true); // for printout only
 
-	injector::WriteMemory<int>(0x0053BA9D, CharacterMemorySize, true);
-	injector::WriteMemory<int>(0x0053B902, CharacterMemorySize, true); // for printout only
+	injector::WriteMemory<int>(CHARACTERMEMORYSIZE_ADDR_1, CharacterMemorySize, true);
+	injector::WriteMemory<int>(CHARACTERMEMORYSIZE_ADDR_2, CharacterMemorySize, true); // for printout only
 
-	injector::WriteMemory<int>(0x0053BAB3, ReplayMemorySize, true);
-	injector::WriteMemory<int>(0x0053B927, ReplayMemorySize, true); // for printout only
+	injector::WriteMemory<int>(REPLAYMEMORYSIZE_ADDR_1, ReplayMemorySize, true);
+	injector::WriteMemory<int>(REPLAYMEMORYSIZE_ADDR_2, ReplayMemorySize, true); // for printout only
 
-	injector::WriteMemory<int>(0x0053BADC, IniFileMemorySize, true);
-	injector::WriteMemory<int>(0x0053B96E, IniFileMemorySize, true); // for printout only
+	injector::WriteMemory<int>(INIFILEMEMORYSIZE_ADDR_1, IniFileMemorySize, true);
+	injector::WriteMemory<int>(INIFILEMEMORYSIZE_ADDR_2, IniFileMemorySize, true); // for printout only
+
+	// Reflection resolution
+	//injector::WriteMemory<int>(0x0053E144, ReflectionResolution, true);
+	//injector::WriteMemory<int>(0x0053E149, ReflectionResolution, true);
+	//injector::WriteMemory<int>(0x0053E176, ReflectionResolution, true);
+	//injector::WriteMemory<int>(0x0053E17B, ReflectionResolution, true);
 
 	// GUI sub_595440
 	if (FixHUD)
 	{
-		injector::MakeCALL(0x0045A8DC, sub_59B840_hook, true);
+		injector::MakeCALL(HOOK_ADDRESS_1, sub_59B840_hook, true);
 
 		if (FixHUD > 1)
 		{
-			injector::MakeCALL(0x0059410A, sub_59B840_hook_2, true);
+			injector::MakeCALL(HOOK_ADDRESS_2, sub_59B840_hook_2, true);
 			//injector::MakeCALL(0x00593FEE, sub_59B6E0_hook, true);
-			injector::MakeCALL(0x00596F6A, sub_59BAE0_hook, true);
-			injector::MakeCALL(0x005980D8, sub_59BAE0_hook, true);
+			injector::MakeCALL(HOOK_ADDRESS_3, sub_59BAE0_hook, true);
+			injector::MakeCALL(HOOK_ADDRESS_4, sub_59BAE0_hook, true);
 
 			// cuffometer position fix - disable writes to its mBounds
 			// X
-			injector::MakeNOP(0x453C95, 3, true);
-			injector::MakeNOP(0x453C16, 3, true);
+			injector::MakeNOP(CUFFOMETER_FIX_ADDR_1, 3, true);
+			injector::MakeNOP(CUFFOMETER_FIX_ADDR_2, 3, true);
 			// Y
-			injector::MakeNOP(0x453C1F, 3, true);
-			injector::MakeNOP(0x453C98, 3, true);
+			injector::MakeNOP(CUFFOMETER_FIX_ADDR_3, 3, true);
+			injector::MakeNOP(CUFFOMETER_FIX_ADDR_4, 3, true);
 
 			// FE file access sniffer // FE: blabla
 			//injector::MakeCALL(0x00593CF1, sub_593DB0_hook, true);
 		}
-	injector::MakeCALL(0x00462FDF, sub_5954A0, true);
-	injector::MakeCALL(0x00463501, sub_5954A0, true);
+	injector::MakeCALL(HOOK_ADDRESS_5, sub_5954A0, true);
+	injector::MakeCALL(HOOK_ADDRESS_6, sub_5954A0, true);
 
 	// Y scale
 	//	injector::MakeNOP(0x00595318, 6, true);
 
 	// X scale
-		injector::MakeNOP(0x00595304, 6, true);
+		injector::MakeNOP(FE_XSCALENOP_ADDR, 6, true);
 
 	// Y functions scale
-		injector::MakeNOP(0x00595351, 6, true);
+		injector::MakeNOP(FE_YFUNCSCALENOP_ADDR, 6, true);
 
 	// X functions scale
-		injector::MakeNOP(0x0059533F, 6, true);
-		injector::MakeCALL(0x005A15A4, FE_CursorPos, true);
+		injector::MakeNOP(FE_XFUNCSCALENOP_ADDR, 6, true);
+		injector::MakeCALL(FE_CURSORPOS_HOOK_ADDR, FE_CursorPos, true);
 
 	// Y pos
 	//	injector::MakeNOP(0x0059532D, 6, true);
 
 	// X pos
-		injector::MakeNOP(0x00595324, 6, true);
+		injector::MakeNOP(FE_XPOSNOP_ADDR, 6, true);
 
 	}
+
+#ifndef HP2DEBUG
 	if (bEnableConsole)
-		injector::MakeJMP(0x00538140, printf, true);
+		injector::MakeJMP(PRINTF_HOOK_ADDR, printf, true);
+#endif
+	// Linux fix
+	//injector::MakeNOP(0x00537FD3, 5, true);
 
 	return 0;
 }

@@ -18,6 +18,13 @@ A rudimentary widescreen fix for Need for Speed: Hot Pursuit 2 on PC
 - If you have less than 1GB RAM: rename HP2WSFix_LowMem.ini to HP2WSFix.ini
 - If any issues arise, install the VC++ 2015 - 2019 Redistibutable package: [DOWNLOAD LINK](https://aka.ms/vs/16/release/vc_redist.x86.exe)
 
+# DirectInput troubleshooting
+Some Windows systems may crash while the game enumerates DirectInput/HID devices. This diagnostic option is available in the `[HP2WSFix]` section of `HP2WSFix.ini` and is disabled by default.
+
+- `KeyboardOnlyDirectInput=1` restricts requests to enumerate all device types to keyboards. This can allow the game to start on affected systems, but gamepads or wheels discovered through that request may not be available. On one Windows 11 system this mode reached the game menu with keyboard and mouse.
+
+This is a workaround, not a general fix for DirectInput/HID instability. If enabling it prevents startup, set it back to `0`.
+
 # Requirements (for the release binaries)
 - SSE2 capable CPU (Pentium 4 and newer)
 - 1GB RAM for HD fonts and textures

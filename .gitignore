@@ -1,0 +1,16 @@
+.vs/
+Debug/
+Release/
+ipch/
+*.obj
+*.pch
+*.pdb
+*.iobj
+*.ipdb
+*.tlog/
+*.recipe
+*.exp
+*.lib
+*.lastbuildstate
+*.FileListAbsolute.txt
+*.suo

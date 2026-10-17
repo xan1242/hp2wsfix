@@ -10,6 +10,11 @@
 #include <direct.h>
 #include <Windows.h>
 #include <Shlobj.h>
+#ifndef DIRECTINPUT_VERSION
+#define DIRECTINPUT_VERSION 0x0700
+#endif
+#include <dinput.h>
+#include <new>
 #include "includes\injector\injector.hpp"
 #include "includes\IniReader.h"
 
@@ -44,6 +49,7 @@ char* CurrentFEShapePointer;
 char CurrentFEShape[255];
 //char* CurrentFEChild;
 bool bEnableConsole = false;
+bool bKeyboardOnlyDirectInput = false;
 bool bDisableLetterboxing = false;
 bool bClassicMapPosition = false;
 bool bAlternativeBackground = false;
@@ -2248,6 +2254,104 @@ char* __stdcall GetUserDir_Hook()
 	return UserDir;
 }
 
+class KeyboardOnlyDirectInput final : public IDirectInputA
+{
+public:
+	explicit KeyboardOnlyDirectInput(LPDIRECTINPUTA original)
+		: original_(original), referenceCount_(1) {}
+
+	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID* object) override
+	{
+		return original_->QueryInterface(iid, object);
+	}
+
+	ULONG STDMETHODCALLTYPE AddRef() override
+	{
+		return static_cast<ULONG>(InterlockedIncrement(&referenceCount_));
+	}
+
+	ULONG STDMETHODCALLTYPE Release() override
+	{
+		LONG remaining = InterlockedDecrement(&referenceCount_);
+		if (remaining == 0)
+		{
+			original_->Release();
+			delete this;
+		}
+		return static_cast<ULONG>(remaining);
+	}
+
+	HRESULT STDMETHODCALLTYPE CreateDevice(REFGUID guid, LPDIRECTINPUTDEVICEA* device, LPUNKNOWN outer) override
+	{
+		return original_->CreateDevice(guid, device, outer);
+	}
+
+	HRESULT STDMETHODCALLTYPE EnumDevices(DWORD deviceType, LPDIENUMDEVICESCALLBACKA callback, LPVOID context, DWORD flags) override
+	{
+		if (deviceType == 0)
+			deviceType = DIDEVTYPE_KEYBOARD;
+		return original_->EnumDevices(deviceType, callback, context, flags);
+	}
+
+	HRESULT STDMETHODCALLTYPE GetDeviceStatus(REFGUID guid) override
+	{
+		return original_->GetDeviceStatus(guid);
+	}
+
+	HRESULT STDMETHODCALLTYPE RunControlPanel(HWND window, DWORD flags) override
+	{
+		return original_->RunControlPanel(window, flags);
+	}
+
+	HRESULT STDMETHODCALLTYPE Initialize(HINSTANCE instance, DWORD version) override
+	{
+		return original_->Initialize(instance, version);
+	}
+
+private:
+	LPDIRECTINPUTA original_;
+	volatile LONG referenceCount_;
+};
+
+typedef HRESULT(WINAPI* DirectInputCreateAProc)(HINSTANCE, DWORD, LPDIRECTINPUTA*, LPUNKNOWN);
+
+HRESULT WINAPI DirectInputCreateA_KeyboardOnly(HINSTANCE instance, DWORD version, LPDIRECTINPUTA* directInput, LPUNKNOWN outer)
+{
+	if (directInput == nullptr)
+		return E_POINTER;
+	*directInput = nullptr;
+
+	HMODULE module = GetModuleHandleA("DINPUT.dll");
+	if (module == nullptr)
+		return E_FAIL;
+
+	DirectInputCreateAProc createDirectInput = reinterpret_cast<DirectInputCreateAProc>(
+		GetProcAddress(module, "DirectInputCreateA"));
+	if (createDirectInput == nullptr)
+		return E_FAIL;
+
+	LPDIRECTINPUTA original = nullptr;
+	HRESULT result = createDirectInput(instance, version, &original, outer);
+	if (FAILED(result))
+		return result;
+	if (original == nullptr)
+		return E_FAIL;
+	if (outer != nullptr)
+	{
+		*directInput = original;
+		return result;
+	}
+
+	KeyboardOnlyDirectInput* filtered = new (std::nothrow) KeyboardOnlyDirectInput(original);
+	if (filtered == nullptr)
+	{
+		original->Release();
+		return E_OUTOFMEMORY;
+	}
+	*directInput = filtered;
+	return result;
+}
+
 int InitRenderCaps()
 {
 	bool bPathWasAbsolute = false;
@@ -2315,6 +2419,7 @@ int InitConfig()
 	struct stat st = { 0 };
 	const char* InputDirString = inireader.ReadString("HP2WSFix", "SaveDir", "save");
 	bEnableConsole = inireader.ReadInteger("HP2WSFix", "EnableConsole", 0);
+	bKeyboardOnlyDirectInput = inireader.ReadInteger("HP2WSFix", "KeyboardOnlyDirectInput", 0) != 0;
 	FixHUD = inireader.ReadInteger("HP2WSFix", "FixHUD", 1);
 	if (FixHUD)
 	{
@@ -2473,6 +2578,14 @@ void InjectRes()
 
 int InitInjector()
 {
+	#ifndef HP2DEBUG
+		if (bKeyboardOnlyDirectInput)
+	{
+		injector::WriteMemory<DWORD>(0x0065D01C,
+				static_cast<DWORD>(reinterpret_cast<ULONG_PTR>(&DirectInputCreateA_KeyboardOnly)), true);
+	}
+	#endif
+
 	InjectRes();
 
 	// dirty FOV ini read hooks (WILL GET REPLACED BY PROPER SCALING HACKS LATER)
